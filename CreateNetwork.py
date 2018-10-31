@@ -38,21 +38,20 @@ class CreateNetwork:
 
     def create_average(self, folder):
         net = None
-        for i, filepath in enumerate(listdir(folder)):
+        weights = dict()
+        for filepath in listdir(folder):
             if net:
                 _net = self.create(join(folder, filepath))
-                output_net = nx.compose(net, _net)
-                new_weights = dict()
                 for u, v in set(net.edges) & set(_net.edges):
-                    new_weights[(u,v)] = (i-1)/float(i)*float(net.get_edge_data(u, v)['weight'])+1./i*float(_net.get_edge_data(u, v)['weight'])
-                for u, v in set(net.edges) - set(_net.edges):
-                    new_weights[(u,v)] = (i-1)/float(i)*float(net.get_edge_data(u, v)['weight'])
+                    weights[(u,v)] += _net.get_edge_data(u, v)['weight']
                 for u, v in set(_net.edges) - set(_net.edges):
-                    new_weights[(u,v)] = 1./i*float(_net.get_edge_data(u, v)['weight'])
-                nx.set_edge_attributes(output_net, name='weight', values=new_weights)
-                net = output_net
+                    weights[(u,v)] = _net.get_edge_data(u, v)['weight']
+                net = nx.compose(net, _net)
             else:
                 net = self.create(join(folder, filepath))
+                weights[(u, v)] = net.get_edge_data(u, v)['weight']
+        weights = weights/len(listdir(folder))
+        nx.set_edge_attributes(net, name='weight', values=weights)
         return net
     
     def draw_avg(self, folder):

@@ -5,9 +5,12 @@ from Bio.PDB import PDBParser
 
 three2one = dict(zip(aa3, aa1))
 one2three = dict(zip(aa1, aa3))
+# path = '/home/hgheerae/Python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent'
+# path = '/home/aria/Stage4A_partie1/python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent'
+path = '/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000_apo.pdb'
 
 A = nx.read_gpickle('tests/test.p')
-structure = PDBParser().get_structure('X', '/home/hgheerae/Python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent')[0]
+structure = PDBParser().get_structure('X', path)[0]
 L_residues = []
 for residue in structure.get_residues():
     if residue.resname in three2one:
@@ -17,10 +20,9 @@ for residue in L_residues:
     if residue not in A.nodes:
         A.add_node(residue)
 
-for i in range(244-len(A.nodes())):
-    A.add_node('X:'+str(i))
-
 print(len(A.nodes()))
 
-B = nx.to_numpy_matrix(A, dtype=int)
-np.savetxt('tests/test.dat', B, fmt='%0i', header='name CA', comments='')
+B = nx.to_numpy_matrix(A)
+B= B/np.max(B)
+print(B)
+np.savetxt('tests/test.dat', B, fmt='%-1f', header='name CA', comments='')
