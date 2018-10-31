@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from os import listdir
 from os.path import join
 import warnings
-from Bio import PDBConstructionWarning
+from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreateNetwork:

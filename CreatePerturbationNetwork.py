@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from os.path import join, dirname
 import warnings
-from Bio import PDBConstructionWarning
+from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreatePerturbationNetwork(CreateNetwork):
@@ -102,4 +102,4 @@ class CreatePerturbationNetwork(CreateNetwork):
 if __name__ == '__main__':
     # CreatePerturbationNetwork(path1='/home/hgheerae/Python/script_lorenza_selection/ttr_v4_3djz_L55P/pdb/pdb3djz.ent', path2='/home/hgheerae/Python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent',pos1=11, pos2=125).draw_perturbation(threshold=4, output='/home/hgheerae/Python/script_lorenza_selection/res.pdf', rearrange=('A', 'B'), save='test.p')
     # CreatePerturbationNetwork(path1='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_apo/', path2='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_prfar/', avg=True).draw_perturbation(threshold=40, output='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/avg.pdf', rearrange=('H', 'F'), save='avg')
-    CreatePerturbationNetwork(path1='/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000_apo.pdb', path2='/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000_prfar.pdb').draw_perturbation(threshold=range(4, 41, 2), output='/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000', rearrange=('H', 'F'), save='frame1000')
+    CreatePerturbationNetwork(path1='/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000_apo_noH.pdb', path2='/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000_prfar_noH.pdb').draw_perturbation(threshold=range(4, 41, 2), output='/home/aria/PerturbationNetworkAnalysis/data/frame1000/frame_1000', rearrange=('H', 'F'), save='frame1000')
