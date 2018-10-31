@@ -5,6 +5,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from os import listdir
 from os.path import join
+import warnings
+from Bio import PDBConstructionWarning
+warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreateNetwork:
     def __init__(self, pos1=None, pos2=None):
@@ -42,14 +45,16 @@ class CreateNetwork:
         for filepath in listdir(folder):
             if net:
                 _net = self.create(join(folder, filepath))
-                for u, v in set(net.edges) & set(_net.edges):
-                    weights[(u,v)] += _net.get_edge_data(u, v)['weight']
-                for u, v in set(_net.edges) - set(_net.edges):
-                    weights[(u,v)] = _net.get_edge_data(u, v)['weight']
+                for u, v in _net.edges():
+                    if (u, v) in weights:
+                        weights[(u,v)] += _net.get_edge_data(u, v)['weight']
+                    else:
+                        weights[(u,v)] = _net.get_edge_data(u, v)['weight']
                 net = nx.compose(net, _net)
             else:
                 net = self.create(join(folder, filepath))
-                weights[(u, v)] = net.get_edge_data(u, v)['weight']
+                for u, v in net.edges():
+                    weights[(u, v)] = net.get_edge_data(u, v)['weight']
         weights = weights/len(listdir(folder))
         nx.set_edge_attributes(net, name='weight', values=weights)
         return net
@@ -66,4 +71,4 @@ class CreateNetwork:
         plt.show()
 
 if __name__ == '__main__':
-    CreateNetwork().draw_avg('/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_apo/')
+    CreateNetwork().draw_avg('/home/aria/PerturbationNetworkAnalysis/data/frames_apo/')
