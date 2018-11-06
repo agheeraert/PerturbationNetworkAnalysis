@@ -28,9 +28,9 @@ parser.add_argument('output',  type=str,
                     help='Output folder for the results')  
 parser.add_argument('-avg',  type=str,
                     help='does the average of the input on folders')
-parser.add_argument('-range',  type=int, nargs=3,
+parser.add_argument('-range',  type=float, nargs=3,
                     help='create the perturbation network for a range of thresholds')
-parser.add_argument('-threshold',  type=int,
+parser.add_argument('-threshold',  type=float,
                     help='create the perturbation network for one threshold')  
 parser.add_argument('-rearrange',  type=str, nargs=2,
                     help='display the full network so that two chains are separated')
