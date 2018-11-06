@@ -2,22 +2,7 @@ from CreatePerturbationNetwork import CreatePerturbationNetwork
 import os 
 from os.path import join
 import argparse
-
-# cwd = os.getcwd()
-# data_dir = join(cwd, 'data')
-
-# for directory in os.listdir(data_dir):
-#     dir_path = join(data_dir, directory)
-#     file1 = None
-#     for filename in os.listdir(dir_path):
-#         if filename[-4:] == '.pdb':
-#             if file1 is None:
-#                 file1=filename
-#             else:
-#                 file2=filename
-
-#     for w in range(40, 41, 2):
-#         CreatePerturbationNetwork(pdb1=join(dir_path, file1), pdb2=join(dir_path, file2)).draw_perturbation(threshold=w, output=join(dir_path, "w_"+str(w)+"_pnet.pdf"), rearrange=('H', 'F'))
+import numpy as np
 
 parser = argparse.ArgumentParser(description='Create the perturbation network of two proteins')
 parser.add_argument('path1',  type=str,
@@ -40,7 +25,7 @@ parser.add_argument('-save',  type=str,
 
 args = parser.parse_args()
 if args.range:
-    threshold = range(args.range[0], args.range[1], args.range[2])
+    threshold = np.arange(args.range[0], args.range[1], args.range[2]).tolist()
 if args.threshold:
     threshold = args.threshold
 if args.rearrange:
