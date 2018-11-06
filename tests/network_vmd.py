@@ -32,17 +32,24 @@ for atom in structure.get_atoms():
                 node2CA[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = coords
 with open(args.output, 'w') as output:
         output.write('draw delete all \n draw color 1 \n')
+        red = None
         for u, v in A.edges():
-            if u[-1] != v[-1]:
+            if red is None:
+                red = A.get_edge_data(u, v)['color']=='r'
+
+            if A.get_edge_data(u, v)['color']=='g'and red:
                 output.write('draw color 7 \n')
+                red=False
+            elif A.get_edge_data(u, v)['color']=='r'and not red:
+                output.write('draw color 1 \n')
+                red=True
             try:
                 output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/8)+' \n')
             except KeyError:
-                pass
-            if u[-1] != v[-1]:
-                output.write('draw color 1 \n')
+                pass                
                 
         for u in A.nodes():
+            output.write('draw color 0 \n')
             try:
                 output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')
             except KeyError:
