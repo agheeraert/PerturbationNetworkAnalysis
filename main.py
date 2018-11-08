@@ -17,9 +17,11 @@ parser.add_argument('-range',  type=float, nargs=3,
                     help='create the perturbation network for a range of thresholds')
 parser.add_argument('-threshold',  type=float,
                     help='create the perturbation network for one threshold')  
+parser.add_argument('-cutoff', type=float, default=5,
+		    help='set the interaction cutoff (in Angstrom)')
 parser.add_argument('-rearrange',  type=str, nargs=2,
                     help='display the full network so that two chains are separated')
-parser.add_argument('-save',  type=str,
+parser.add_argument('-save',  type=str, default=True,
                     help='pickles the network')                      
 
 
@@ -36,4 +38,4 @@ if args.avg:
 else:
     avg = False
 
-CreatePerturbationNetwork(path1=args.path1, path2=args.path2, avg=avg).draw_perturbation(threshold=threshold, output=args.output, rearrange=args.rearrange, save=args.save)
+CreatePerturbationNetwork(path1=args.path1, path2=args.path2, avg=avg, cutoff=args.cutoff).draw_perturbation(threshold=threshold, output=args.output, rearrange=args.rearrange, save=args.save)

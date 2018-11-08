@@ -1,6 +1,7 @@
 from CreateNetwork import CreateNetwork
 import networkx as nx
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import os
 from os.path import join, dirname
 import warnings
@@ -8,7 +9,7 @@ from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreatePerturbationNetwork(CreateNetwork):
-    def __init__(self, path1, path2, pos1=None, pos2=None, avg=False):
+    def __init__(self, path1, path2, pos1=None, pos2=None, cutoff=5, avg=False):
         super(CreatePerturbationNetwork, self).__init__()
         if not avg:
             self.net1 = self.create(path1)

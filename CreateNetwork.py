@@ -11,15 +11,16 @@ from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreateNetwork:
-    def __init__(self, pos1=None, pos2=None):
+    def __init__(self, pos1=None, pos2=None, cutoff=5):
         self.pos1 = pos1
         self.pos2 = pos2
         self.three2one = dict(zip(aa3, aa1))
         self.one2three = dict(zip(aa1, aa3))
+        self.cutoff = cutoff
 
     def create(self, pdb):
         mol = bg.Pmolecule(pdb)
-        self.net = mol.network(weight=True)
+        self.net = mol.network(cutoff=self.cutoff, weight=True)
         self.structure = PDBParser().get_structure('X', pdb)[0]
         if self.pos1 and self.pos2:
             for node in list(self.net.nodes):
