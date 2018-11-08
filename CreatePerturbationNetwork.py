@@ -10,7 +10,7 @@ warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreatePerturbationNetwork(CreateNetwork):
     def __init__(self, path1, path2, pos1=None, pos2=None, cutoff=5, avg=False):
-        super(CreatePerturbationNetwork, self).__init__()
+        super().__init__(pos1=pos1, pos2=pos2, cutoff=cutoff)
         if not avg:
             self.net1 = self.create(path1)
             self.net2 = self.create(path2)
