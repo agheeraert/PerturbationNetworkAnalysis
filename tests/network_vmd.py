@@ -11,9 +11,13 @@ parser = argparse.ArgumentParser(description='file paths')
 parser.add_argument('pdb_path',  type=str,
                     help='pdb file')
 parser.add_argument('net_path',  type=str,
-                    help='output file')
+                    help='network file')
 parser.add_argument('output',  type=str,
                     help='output file')
+parser.add_argument('-div',  type=float, default=8,
+                    help='Weight diviter for the radius of the cylinders')                    
+parser.add_argument('-nc',  type=str,
+                    help='the network has no color attribute')                    
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
@@ -22,6 +26,7 @@ three2one = dict(zip(aa3, aa1))
 
 A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
+color = not args.nc
 
 node2CA = {}
 for atom in structure.get_atoms():
@@ -34,17 +39,18 @@ with open(args.output, 'w') as output:
         output.write('draw delete all \n draw color 1 \n')
         red = None
         for u, v in A.edges():
-            if red is None:
-                red = A.get_edge_data(u, v)['color']=='r'
+            if color:
+                if red is None and color:
+                    red = A.get_edge_data(u, v)['color']=='r'
 
-            if A.get_edge_data(u, v)['color']=='g'and red:
-                output.write('draw color 7 \n')
-                red=False
-            elif A.get_edge_data(u, v)['color']=='r'and not red:
-                output.write('draw color 1 \n')
-                red=True
+                if A.get_edge_data(u, v)['color']=='g'and red:
+                    output.write('draw color 7 \n')
+                    red=False
+                elif A.get_edge_data(u, v)['color']=='r'and not red:
+                    output.write('draw color 1 \n')
+                    red=True
             try:
-                output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/8)+' \n')
+                output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/args.div)+' \n')
             except KeyError:
                 pass                
                 
