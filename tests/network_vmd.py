@@ -21,8 +21,6 @@ parser.add_argument('-nc',  type=str,
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
-# path = '/home/hgheerae/Python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent'
-# path = '/home/aria/Stage4A_partie1/python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent'
 
 A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
