@@ -71,10 +71,10 @@ class CreatePerturbationNetwork(CreateNetwork):
                 nx.draw(net, with_labels=True, font_weight='bold', edge_color=colors, pos=positions)
             except nx.NetworkXError:
                 nx.draw(net, with_labels=True, font_weight='bold', edge_color=colors)   
-            plt.savefig(output+'_'+str(elt)+'.pdf')
+            plt.savefig(join(output, self.cutoff'_'+str(elt)+'.pdf'))
             output_folder = dirname(output)
             if isinstance(save, str):
-                nx.write_gpickle(net, join(output_folder, save+'_'+str(elt)+'.p'))        
+                nx.write_gpickle(net, join(output_folder, self.cutoff+'_'+str(elt)+'.p'))        
             if neighbors:
                 if 'neighbors_'+str(elt) not in os.listdir(output_folder):    
                     os.mkdir(join(output_folder, 'neighbors_'+str(elt)))
