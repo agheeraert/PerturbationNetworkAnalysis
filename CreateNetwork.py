@@ -64,9 +64,9 @@ class CreateNetwork:
         return net
 
     def save_avg(self, folder, output):
-	net = self.create_average(folder)
-	nx.write_gpickle(net, output) 
-    
+        net = self.create_average(folder)
+        nx.write_gpickle(net, output) 
+
     def draw_avg(self, folder, output):
         net = self.create_average(folder)
         f = plt.figure()
