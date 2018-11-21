@@ -3,6 +3,7 @@ from os import path, listdir
 
 perturbation_folder = '/home/agheerae/results/cutoff/'
 output_folder = '/home/agheerae/results/induced/'
+log = path.join(output_folder, 'not_in_net.log')
 root_nodes = ['C84:H', 'K19:F', 'H178:H', 'E180:H']
 L_cutoffs = list(range(3, 10))
 
@@ -14,10 +15,14 @@ for cutoff in L_cutoffs:
             weights = nx.get_edge_attributes(net, 'weight')
             colors = nx.get_edge_attributes(net, 'color')
             for root in root_nodes:
-                tree = nx.bfs_tree(net, root)
-                for u, v in net.edges():
-                    if u in tree.nodes() and v in tree.nodes() and not (u, v) in tree.edges():
-                        tree.add_edge(u, v)
-                nx.set_edge_attributes(tree, 'weight', weights)
-                nx.set_edge_attributes(tree, 'colors', colors)
-                nx.write_gpickle(path.join(output_folder, 'induced_'+str(cutoff), _file[:-2]+root))
+                if root in net.nodes():
+                    tree = nx.bfs_tree(net, root)
+                    for u, v in net.edges():
+                        if u in tree.nodes() and v in tree.nodes() and not (u, v) in tree.edges():
+                            tree.add_edge(u, v)
+                    nx.set_edge_attributes(tree, 'weight', weights)
+                    nx.set_edge_attributes(tree, 'colors', colors)
+                    nx.write_gpickle(path.join(output_folder, 'induced_'+str(cutoff), _file[:-2]+root))
+                else:
+                    with open(log, 'a') as logfile:
+                        logfile.write('cutoff: '+str(cutoff)+' file: '+_file+' node: '+ root+'\n')
