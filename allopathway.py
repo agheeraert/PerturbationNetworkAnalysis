@@ -10,4 +10,4 @@ allopathway = [loop1, b2, a2, a3, oloop_and_a1, pgvg, c84]
 allopathway_nodes = []
 for elt in allopathway:
     for i in range(elt["start"], elt["end"]+1):
-        allopathway_nodes.append(i+':'+elt["chain"])
+        allopathway_nodes.append(str(i)+':'+elt["chain"])

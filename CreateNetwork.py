@@ -62,6 +62,10 @@ class CreateNetwork:
             new_weights[elt]=weights[elt]/len(listdir(folder))
         nx.set_edge_attributes(net, name='weight', values=new_weights)
         return net
+
+    def save_avg(self, folder, output)
+	net = self.create_average(folder)
+	nx.write_gpickle(net, output) 
     
     def draw_avg(self, folder, output):
         net = self.create_average(folder)
@@ -72,7 +76,6 @@ class CreateNetwork:
     def draw(self, pdb, output):
         net = self.create(pdb)
         nx.draw(net, with_labels=True, font_weight='bold')
-        nw.write_gpickle(net, output)
 
 if __name__ == '__main__':
     CreateNetwork().draw_avg('/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/apo/', '/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/apo.p')

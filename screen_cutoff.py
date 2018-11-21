@@ -22,8 +22,8 @@ def r2(x, y):
 class args:
     path1 = "/home/agheerae/PDB/Apo_frames/Sim1/frame_1.pdb"
     path2 = "/home/agheerae/PDB/Prfar_frames/Sim1/frame_1.pdb"
-    output = "/home/agheerae/Python/PerturbationNetworkAnalysis/results/screen/"
-    range = [3, 10, 1]
+    output = "/home/agheerae/Python/PerturbationNetworkAnalysis/results/screen_05/"
+    range = [3, 10, 0.5]
 
 L_nets_apo, L_nets_bound = [], []
 L_cutoffs = np.arange(args.range[0], args.range[1], args.range[2]).tolist()

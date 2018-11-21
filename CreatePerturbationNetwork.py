@@ -50,27 +50,27 @@ class CreatePerturbationNetwork(CreateNetwork):
         perturbation.remove_nodes_from(list(nx.isolates(perturbation)))
         return perturbation
 
-    def draw_perturbation(self, threshold, output, rearrange=None, neighbors=True, chains=True, save=None):
+    def draw_perturbation(self, threshold, output, rearrange=None, neighbors=False, chains=False, save=None):
         if isinstance(threshold, int) or isinstance(threshold, float):
             threshold = [threshold]
         for elt in threshold:
             net = self.perturbation(elt)
             colors = nx.get_edge_attributes(net, 'color').values()
             weights = nx.get_edge_attributes(net, 'weight').values()
-            ch, cf, positions = 0, 0, {}
             if rearrange:
+                c1, c2, positions = 0, 0, {}
                 for node in net.nodes():
                     if node[-1] == rearrange[0]:
-                        positions[node] = [ch%2, 20*(ch//2+(ch+1)%2)]
-                        ch+=1
+                        positions[node] = [c1%2, (c1//2-(c1+1)%2)]
+                        c1+=1
                     elif node[-1] == rearrange[1]:
-                        positions[node] = [cf%2+10, 20*(cf//2+(ch+1)%2)]
-                        cf+=1
-            fig = plt.figure()
+                        positions[node] = [c2%2+3, (c2//2-(c1+1)%2)]
+                        c2+=1
+                fig = plt.figure()
             try:
-                nx.draw(net, with_labels=True, font_weight='bold', edge_color=colors, pos=positions)
+                nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, pos=positions, node_size=100, node_color='grey', font_size=8)
             except nx.NetworkXError:
-                nx.draw(net, with_labels=True, font_weight='bold', edge_color=colors)   
+                nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, node_size=100, node_color='grey', font_size=8)   
             plt.savefig(join(output, str(self.cutoff)+'_'+str(elt)+'.pdf'))
             output_folder = dirname(output)
             if isinstance(save, str):
