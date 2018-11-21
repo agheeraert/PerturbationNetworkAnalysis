@@ -63,7 +63,7 @@ class CreateNetwork:
         nx.set_edge_attributes(net, name='weight', values=new_weights)
         return net
 
-    def save_avg(self, folder, output)
+    def save_avg(self, folder, output):
 	net = self.create_average(folder)
 	nx.write_gpickle(net, output) 
     
