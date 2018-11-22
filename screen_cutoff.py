@@ -5,31 +5,26 @@ import matplotlib.pyplot as plt
 import os.path
 from scipy.stats import linregress
 
-# parser = argparse.ArgumentParser(description='Screen the number of degree and weight of each node and compare it within the different states')
-# parser.add_argument('path1',  type=str,
-#                     help='Static input file path of reference (apo)')
-# parser.add_argument('path2',  type=str,
-#                     help='Static input file path to compare (complex)')
-# parser.add_argument('output',  type=str,
-#                     help='Output directory for the results')
-# parser.add_argument('range',  type=float, nargs=3,
-#                     help='Range within which to screen the cutoff')
-# args = parser.parse_args()
+parser = argparse.ArgumentParser(description='Screen the number of degree and weight of each node and compare it within the different states')
+parser.add_argument('path1',  type=str,
+                    help='Static input file path of reference (apo)')
+parser.add_argument('path2',  type=str,
+                    help='Static input file path to compare (complex)')
+parser.add_argument('output',  type=str,
+                    help='Output directory for the results')
+parser.add_argument('range',  type=float, nargs=3,
+                    help='Range within which to screen the cutoff')
+args = parser.parse_args()
+
 def r2(x, y):
     slope, intercept, r_value, p_value, std_err = linregress(x, y)
     return str(r_value)[:5]
 
-class args:
-    path1 = "/home/agheerae/PDB/Apo_frames/Sim1/frame_1.pdb"
-    path2 = "/home/agheerae/PDB/Prfar_frames/Sim1/frame_1.pdb"
-    output = "/home/agheerae/Python/PerturbationNetworkAnalysis/results/screen_05/"
-    range = [3, 10, 0.5]
-
 L_nets_apo, L_nets_bound = [], []
 L_cutoffs = np.arange(args.range[0], args.range[1], args.range[2]).tolist()
 for elt in L_cutoffs:
-    L_nets_apo.append(CreateNetwork(cutoff=elt).create(args.path1))
-    L_nets_bound.append(CreateNetwork(cutoff=elt).create(args.path2))
+    L_nets_apo.append(CreateNetwork(cutoff=elt).create(pdb=args.path1))
+    L_nets_bound.append(CreateNetwork(cutoff=elt).create(pdb=args.path2))
 
 for node in L_nets_apo[0].nodes():
     L_degrees_apo, L_weights_apo, L_degrees_bound, L_weights_bound  = [], [], [], []

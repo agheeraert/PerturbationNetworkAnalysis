@@ -101,6 +101,4 @@ class CreatePerturbationNetwork(CreateNetwork):
 
 
 if __name__ == '__main__':
-    # CreatePerturbationNetwork(path1='/home/hgheerae/Python/script_lorenza_selection/ttr_v4_3djz_L55P/pdb/pdb3djz.ent', path2='/home/hgheerae/Python/script_lorenza_selection/ttr_v4_1f41_WT_HUM/pdb/pdb1f41.ent',pos1=11, pos2=125).draw_perturbation(threshold=4, output='/home/hgheerae/Python/script_lorenza_selection/res.pdf', rearrange=('A', 'B'), save='test.p')
-    # CreatePerturbationNetwork(path1='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_apo/', path2='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_prfar/', avg=True).draw_perturbation(threshold=40, output='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/avg.pdf', rearrange=('H', 'F'), save='avg')
-    CreatePerturbationNetwork(path1='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_apo_noH/', path2='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/frames_prfar_noH', avg=True).draw_perturbation(threshold=range(1, 30, 1), output='/home/hgheerae/Python/PerturbationNetworkAnalysis/data/avg/', rearrange=('H', 'F'), save='avg')
+    CreatePerturbationNetwork(path1='/home/agheerae/Python/PerturbationNetworkAnalysis/data/apo_all/', path2='/home/agheerae/Python/PerturbationNetworkAnalysis/data/prfar_all/', avg=True).draw_perturbation(threshold=range(1, 30, 1), output='/home/agheerae/Python/PerturbationNetworkAnalysis/data/', rearrange=('H', 'F'), save='avg')

@@ -16,6 +16,7 @@ class CreateNetwork:
         self.pos2 = pos2
         self.three2one = dict(zip(aa3, aa1))
         self.one2three = dict(zip(aa1, aa3))
+        self.three2one['5CS'] = 'C'
         self.cutoff = cutoff
 
     def create(self, pdb):
@@ -30,16 +31,20 @@ class CreateNetwork:
 
         residues, bad_nodes = [], []
         for residue in self.structure.get_residues():
-            if residue.resname in self.three2one:
-                residues.append(self.three2one[residue.resname])
-            else:
-                bad_nodes.append(residue.parent.id+str(residue.id[1]))
-        self.net.remove_nodes_from(bad_nodes)
+            residues.append(self.three2one[residue.resname])
+        #     else:
+        #         bad_nodes.append(residue.parent.id+str(residue.id[1]))
+        # self.net.remove_nodes_from(bad_nodes)
+        # print(bad_nodes)
         old_labels = self.net.nodes
         labels = [a+b[1:]+':'+b[0] for a,b in zip(residues, old_labels)]
         mapping = dict(zip(old_labels, labels))
         self.net = nx.relabel_nodes(self.net, mapping)
         return self.net
+
+    def save(self, pdb, output):
+        net = self.create(pdb)
+        nx.write_gpickle(net, output)
 
     def create_average(self, folder):
         net = None
@@ -78,6 +83,4 @@ class CreateNetwork:
         nx.draw(net, with_labels=True, font_weight='bold')
 
 if __name__ == '__main__':
-    CreateNetwork().draw_avg('/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/apo/', '/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/apo.p')
-    CreateNetwork().draw_avg('/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/prfar/', '/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/prfar.p')
-
+    CreateNetwork().create_average('data/apo_all/')
