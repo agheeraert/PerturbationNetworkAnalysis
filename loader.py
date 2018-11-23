@@ -4,15 +4,24 @@ from os.path import dirname
 import matplotlib.pyplot as plt
 
 
-new_thresh = np.arange(55, 100, 1).tolist()
-chain1 = 'A'
-chain2 = 'B'
+new_thresh = np.arange(0, 2, 1).tolist()
+chain1 = 'H'
+chain2 = 'F'
+rename = True
 
-for i in range(7,10):
-    load_path = '/home/agheerae/results/yeast/cutoff/yeast_'+str(i)+'/'+str(i)+'_1.p'
-    output_str1 = '/home/agheerae/results/yeast/cutoff/yeast_'+str(i)+'/'+str(i)+'_'
+for i in range(3,10):
+    load_path = '/home/agheerae/results/sim1/cutoff/cutoff_'+str(i)+'/'+str(i)+'_0.p'
+    output_str1 = '/home/agheerae/results/sim1/cutoff/cutoff_'+str(i)+'/'+str(i)+'_'
     net = nx.read_gpickle(load_path)
     output_folder = dirname(load_path)
+    if rename:
+        mapping = {}
+        for node in net.nodes():
+            if node[-1] == chain1:
+                mapping[node] = node[:-1]+chain2
+            elif node[-1] == chain2:
+                mapping[node] = node[:-1]+chain1
+        net = nx.relabel_nodes(net, mapping)
 
     for elt in new_thresh:
         to_remove_edges = []

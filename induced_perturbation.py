@@ -1,14 +1,15 @@
 import networkx as nx 
 from os import path, listdir
+import matplotlib.pyplot as plt
 
-perturbation_folder = '/home/agheerae/results/yeast/cutoff/'
-output_folder = '/home/agheerae/results/yeast/induced/'
+perturbation_folder = '/home/agheerae/results/all_simu/cutoff/'
+output_folder = '/home/agheerae/results/all_simu/induced/'
 log = path.join(output_folder, 'not_in_net.log')
-root_nodes = ['C83:A']
+root_nodes = ['K19:F', 'C84:H']
 L_cutoffs = list(range(3, 10))
 
 for cutoff in L_cutoffs:
-    cutoff_dir = path.join(perturbation_folder, 'yeast_'+str(cutoff))
+    cutoff_dir = path.join(perturbation_folder, 'cutoff_'+str(cutoff))
     for _file in listdir(cutoff_dir):
         if _file[-2:] == '.p':
             net = nx.read_gpickle(path.join(cutoff_dir, _file))
@@ -23,6 +24,9 @@ for cutoff in L_cutoffs:
                     nx.set_edge_attributes(tree, name='weight', values=weights)
                     nx.set_edge_attributes(tree, name='color', values=colors)
                     nx.write_gpickle(tree, path.join(output_folder, 'induced_'+str(cutoff), _file[:-2]+'_'+root+'.p'))
+                    f = plt.figure()
+                    nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, node_size=100, node_color='grey', font_size=8)
+                    plt.savefig(path.join(output_folder, 'induced_'+str(cutoff), _file[:-2]+'_'+root+'.pdf'))
                 else:
                     with open(log, 'a') as logfile:
                         logfile.write('cutoff: '+str(cutoff)+' file: '+_file+' node: '+ root+'\n')
