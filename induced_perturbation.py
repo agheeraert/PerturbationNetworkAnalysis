@@ -24,8 +24,13 @@ for cutoff in L_cutoffs:
                     nx.set_edge_attributes(tree, name='weight', values=weights)
                     nx.set_edge_attributes(tree, name='color', values=colors)
                     nx.write_gpickle(tree, path.join(output_folder, 'induced_'+str(cutoff), _file[:-2]+'_'+root+'.p'))
+                    weights = list(nx.get_edge_attributes(tree, 'weight').values())
+                    colors = list(nx.get_edge_attributes(tree, 'color').values())
+                    if len(weights) == 1:
+                        weights = weights[0]
+                        colors = colors[0]
                     f = plt.figure()
-                    nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, node_size=100, node_color='grey', font_size=8)
+                    nx.draw(tree, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, node_size=100, node_color='grey', font_size=8)
                     plt.savefig(path.join(output_folder, 'induced_'+str(cutoff), _file[:-2]+'_'+root+'.pdf'))
                 else:
                     with open(log, 'a') as logfile:
