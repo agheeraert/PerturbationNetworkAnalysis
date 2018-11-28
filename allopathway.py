@@ -28,10 +28,7 @@ allopathway = [loop1, b2, a2, a3, oloop_and_a1, pgvg, c84]
 allopathway_nodes = []
 for elt in allopathway:
     for i in range(elt["start"], elt["end"]+1):
-        if elt["chain"] == 'F':
-            allopathway_nodes.append(hisH[i]+str(i)+':H')
-        else:
-            allopathway_nodes.append(hisF[i]+str(i)+':F')
+        allopathway_nodes.append(hisF[i]+str(i)+':'+elt["chain"])
 
 if __name__ == '__main__':
-    print(allopathway_nodes)
+    print(allopathway_nodes, len(allopathway_nodes)/500)

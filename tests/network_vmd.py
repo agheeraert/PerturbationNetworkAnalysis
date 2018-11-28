@@ -13,18 +13,18 @@ parser.add_argument('pdb_path',  type=str,
 parser.add_argument('net_path',  type=str,
                     help='network file')
 parser.add_argument('output',  type=str,
-                    help='output file')
-parser.add_argument('-div',  type=float, default=8,
-                    help='Weight diviter for the radius of the cylinders')                    
+                    help='output file')                   
 parser.add_argument('-nc',  type=str,
                     help='the network has no color attribute')                    
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
-
+three2one['5CS'] = 'C'
 A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
 color = not args.nc
+
+div = max(nx.get_edge_attributes(A, 'weight').values())/1.5
 
 node2CA = {}
 for atom in structure.get_atoms():
@@ -33,6 +33,7 @@ for atom in structure.get_atoms():
         if residue.resname in three2one:
                 coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
                 node2CA[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = coords
+
 with open(args.output, 'w') as output:
         output.write('draw delete all \n draw color 1 \n')
         red = None
@@ -48,12 +49,12 @@ with open(args.output, 'w') as output:
                     output.write('draw color 1 \n')
                     red=True
             try:
-                output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/args.div)+' \n')
+                output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
             except KeyError:
-                pass                
+                pass               
                 
         for u in A.nodes():
-            output.write('draw color 0 \n')
+            output.write('draw color 2 \n')
             try:
                 output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')
             except KeyError:

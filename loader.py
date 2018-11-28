@@ -4,12 +4,12 @@ from os.path import dirname
 import matplotlib.pyplot as plt
 
 
-new_thresh = np.arange(0, 2, 1).tolist()
+new_thresh = np.arange(0.1, 1, 0.1).tolist()
 chain1 = 'H'
 chain2 = 'F'
-rename = True
+rename = False
 
-for i in range(3,10):
+for i in range(3, 4):
     load_path = '/home/agheerae/results/sim1/cutoff/cutoff_'+str(i)+'/'+str(i)+'_0.p'
     output_str1 = '/home/agheerae/results/sim1/cutoff/cutoff_'+str(i)+'/'+str(i)+'_'
     net = nx.read_gpickle(load_path)
