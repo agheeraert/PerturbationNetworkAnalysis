@@ -1,7 +1,7 @@
 import networkx as nx
 
-L_cutoffs = list(range(3, 10))
-L_thresh = list(range(1, 30))
+L_cutoffs = list(range(6, 10))
+L_thresh = list(range(30, 100))
 
 def cut(net, thresh):
     to_remove_edges = []
@@ -16,15 +16,19 @@ def cut(net, thresh):
 
 
 for i in L_cutoffs:
-    load_apo = '/home/agheerae/results/static/apo_'+str(i)+'.p'
-    load_prfar = '/home/agheerae/results/static/prfar_'+str(i)+'.p'
+    load_apo = '/home/agheerae/results/sim1/nets/threshold/apo_'+str(i)+'_0.p'
+    load_prfar = '/home/agheerae/results/sim1/nets/threshold/prfar_'+str(i)+'_0.p'
     net_apo = nx.read_gpickle(load_apo)
     net_prfar = nx.read_gpickle(load_prfar)
     for j in L_thresh:
-        output_apo = '/home/agheerae/results/static/apo_'+str(i)+'_'+str(j)+'.p'
-        output_prfar = '/home/agheerae/results/static/prfar_'+str(i)+'_'+str(j)+'.p'
-        nx.write_gpickle(cut(net_apo, j), output_apo)
-        nx.write_gpickle(cut(net_prfar, j), output_prfar)
+        output_apo = '/home/agheerae/results/sim1/nets/threshold/apo_'+str(i)+'_'+str(j)+'.p'
+        output_prfar = '/home/agheerae/results/sim1/nets/threshold/prfar_'+str(i)+'_'+str(j)+'.p'
+        cut_apo = cut(net_apo, j)
+        if len(cut_apo.nodes()) != 0:
+                nx.write_gpickle(cut_apo, output_apo)
+        cut_prfar = cut(net_prfar, j)
+        if len(cut_prfar.nodes) !=0:
+                nx.write_gpickle(cut_prfar, output_prfar)
         
 
 

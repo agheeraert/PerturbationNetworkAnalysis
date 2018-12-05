@@ -4,11 +4,11 @@ import os
 import networkx as nx
 import pandas as pd
 
-base_folder = '/home/agheerae/results/all_simu/cutoff/'
+base_folder = '/home/agheerae/results/sim1/induced/'
 out_edge1 = os.path.join(base_folder, 'allosteric_path1_edges.xlsx')
 out_edge2 = os.path.join(base_folder, 'allosteric_path1s_edges.xlsx')
 out_edge3 = os.path.join(base_folder, 'allosteric_path2_edges.xlsx')
-out_node1 = os.path.join(base_folder, 'allosteric_path1_node.xlsx')
+out_node1 = os.path.join(base_folder, 'allosteric_path1_nodes.xlsx')
 out_node2 = os.path.join(base_folder, 'allosteric_path1s_nodes.xlsx')
 out_node3 = os.path.join(base_folder, 'allosteric_path2_nodes.xlsx')
 

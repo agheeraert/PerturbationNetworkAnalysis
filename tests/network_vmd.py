@@ -14,8 +14,10 @@ parser.add_argument('net_path',  type=str,
                     help='network file')
 parser.add_argument('output',  type=str,
                     help='output file')                   
-parser.add_argument('-nc',  type=str,
-                    help='the network has no color attribute')                    
+parser.add_argument('-nc',  type=bool, default=False,
+                    help='the network has no edge color attribute')      
+parser.add_argument('--node', type=bool, default=False,
+                    help="to draw node networks")              
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
@@ -24,7 +26,8 @@ A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
 color = not args.nc
 
-div = max(nx.get_edge_attributes(A, 'weight').values())/1.5
+if not args.node:
+    div = max(nx.get_edge_attributes(A, 'weight').values())/1.5
 
 node2CA = {}
 for atom in structure.get_atoms():
@@ -41,20 +44,23 @@ with open(args.output, 'w') as output:
             if color:
                 if red is None and color:
                     red = A.get_edge_data(u, v)['color']=='r'
-
                 if A.get_edge_data(u, v)['color']=='g'and red:
                     output.write('draw color 7 \n')
                     red=False
                 elif A.get_edge_data(u, v)['color']=='r'and not red:
                     output.write('draw color 1 \n')
                     red=True
-            try:
+            if not args.node:
                 output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
-            except KeyError:
-                pass               
-                
-        for u in A.nodes():
+            else:
+                output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+'1 \n')
             output.write('draw color 2 \n')
+        for u in A.nodes():
+            if args.node:
+                if A.nodes(data=True)[u]['color']=='g':
+                    output.write('draw color 7 \n')
+                elif A.nodes(data=True)[u]['color']=='r':
+                    output.write('draw color 1 \n')
             try:
                 output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')
             except KeyError:

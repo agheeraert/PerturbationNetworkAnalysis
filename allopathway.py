@@ -29,6 +29,12 @@ allopathway_nodes = []
 for elt in allopathway:
     for i in range(elt["start"], elt["end"]+1):
         allopathway_nodes.append(hisF[i]+str(i)+':'+elt["chain"])
+b1F = {"chain": 'F', "start": 1, "end": 16}
+a1F = {"chain": 'F', "start": 30, "end": 45}
+b3F = {"chain": 'F', "start": 73, "end": 84}
+b4F = {"chain": 'F', "start": 95, "end": 102}
+
 
 if __name__ == '__main__':
     print(allopathway_nodes, len(allopathway_nodes)/500)
+
