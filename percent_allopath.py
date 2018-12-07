@@ -4,7 +4,7 @@ import os
 import networkx as nx
 import pandas as pd
 
-base_folder = '/home/agheerae/results/sim1/induced/'
+base_folder = '/home/agheerae/results/sim4/pertnet/'
 out_edge1 = os.path.join(base_folder, 'allosteric_path1_edges.xlsx')
 out_edge2 = os.path.join(base_folder, 'allosteric_path1s_edges.xlsx')
 out_edge3 = os.path.join(base_folder, 'allosteric_path2_edges.xlsx')
@@ -85,15 +85,15 @@ df1 = pd.DataFrame(res1)
 df2 = pd.DataFrame(res2)
 df3 = pd.DataFrame(res3)
 df4 = pd.DataFrame(res4)
-df5 = pd.DataFrame(array)
-df6 = pd.DataFrame(array2)
+# df5 = pd.DataFrame(array)
+# df6 = pd.DataFrame(array2)
 
 df1.to_excel(out_edge1)
 df2.to_excel(out_edge2)
 df3.to_excel(out_node1)
 df4.to_excel(out_node2)
-df5.to_excel(out_edge3)
-df6.to_excel(out_node3)
+# df5.to_excel(out_edge3)
+# df6.to_excel(out_node3)
 
 
 

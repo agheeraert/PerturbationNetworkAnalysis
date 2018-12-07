@@ -4,35 +4,42 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 import matplotlib.lines as mlines
-marker = itertools.cycle((',', '+', '.', 'x', '*', 's', 'v')) 
+markers = itertools.cycle((',', '+', '.', 'x', '*', 's', 'v')) 
+colors = itertools.cycle(('r', 'g', 'b', 'c', 'purple')) 
 
-path1 = '/home/agheerae/results/avg_sims/induced/'
-path2 = '/home/agheerae/results/sim1/induced/'
-excel1 = path.join(path1, 'allosteric_path1s_edges.xlsx')
-excel2 = path.join(path2, 'allosteric_path1s_edges.xlsx')
 L_cutoffs = list(range(3,10))
-thresh_max = 40
+thresh_max = 30
 
-all_simu = pd.read_excel(excel1).values
-sim1 = pd.read_excel(excel2).values
+L_path = ['/home/agheerae/results/avg_sims/pertnet/', '/home/agheerae/results/sim1/pertnet/', '/home/agheerae/results/sim2/pertnet/', 
+'/home/agheerae/results/sim3/pertnet/', '/home/agheerae/results/sim4/pertnet/']
+L_excel = []
+
+for filepath in L_path:
+    L_excel.append(path.join(filepath, 'allosteric_path1s_nodes.xlsx'))
+
+sims = []
+for excel in L_excel:
+    sims.append(pd.read_excel(excel).values)
 
 # sim1_Y, all_sim_Y = [], []
 lines = []
 f = plt.figure()
-for i in L_cutoffs:
-    new_marker = next(marker)
-    plt.plot(range(thresh_max+1), sim1[i-3,:thresh_max+1], c='g', marker=new_marker)
-    plt.plot(range(thresh_max+1), all_simu[i-3,:thresh_max+1], c='r', marker=new_marker)
-    lines.append(mlines.Line2D([], [], color='black', marker=new_marker, label='Cutoff '+str(i)+'A'))
-
-lines.append(mlines.Line2D([], [], color='g', label='Simulation 1'))
-lines.append(mlines.Line2D([], [], color='r', label='Average of 4'))
+for i, sim in enumerate(sims):
+    color = next(colors)
+    if i ==0:
+        lines.append(mlines.Line2D([], [], color=color, label='Average of 4'))
+    else:
+        lines.append(mlines.Line2D([], [], color=color, label='Simulation '+str(i)))
+    for cutoff in L_cutoffs:
+        marker = next(markers)
+        plt.plot(range(thresh_max), sim[cutoff-3,:thresh_max], c=color, marker=marker) 
+        if i == 0:      
+            lines.append(mlines.Line2D([], [], color='black', marker=marker, label='Cutoff '+str(cutoff)+'A'))
 
 plt.xlabel('Threshold')
-plt.ylabel('Number of edges in the induced network')
-plt.ylim(0, 2000)
+plt.ylabel('Total number of nodes in the perturbation network')
 plt.legend(handles=lines)
-plt.savefig('/home/agheerae/results/comp_induced_edges_tot.pdf')
+plt.savefig('/home/agheerae/results/all_sims_nodes_tot.pdf')
 
 
 
