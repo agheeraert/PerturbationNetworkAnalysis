@@ -69,7 +69,7 @@ class CreatePerturbationNetwork(CreateNetwork):
                 fig = plt.figure()
             try:
                 nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, pos=positions, node_size=100, node_color='grey', font_size=8)
-            except nx.NetworkXError:
+            except (nx.NetworkXError, UnboundLocalError):
                 nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, node_size=100, node_color='grey', font_size=8)   
             plt.savefig(join(output, str(self.cutoff)+'_'+str(elt)+'.pdf'))
             output_folder = dirname(output)

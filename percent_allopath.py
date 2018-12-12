@@ -4,7 +4,7 @@ import os
 import networkx as nx
 import pandas as pd
 
-base_folder = '/home/agheerae/results/sim4/pertnet/'
+base_folder = '/home/agheerae/results/timewin_500/pertnet/'
 out_edge1 = os.path.join(base_folder, 'allosteric_path1_edges.xlsx')
 out_edge2 = os.path.join(base_folder, 'allosteric_path1s_edges.xlsx')
 out_edge3 = os.path.join(base_folder, 'allosteric_path2_edges.xlsx')

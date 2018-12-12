@@ -5,13 +5,13 @@ import numpy as np
 import itertools
 import matplotlib.lines as mlines
 markers = itertools.cycle((',', '+', '.', 'x', '*', 's', 'v')) 
-colors = itertools.cycle(('r', 'g', 'b', 'c', 'purple')) 
+colors = itertools.cycle(('r', 'g', 'b', 'c', 'y', 'olive', 'm')) 
 
 L_cutoffs = list(range(3,10))
 thresh_max = 30
 
-L_path = ['/home/agheerae/results/avg_sims/pertnet/', '/home/agheerae/results/sim1/pertnet/', '/home/agheerae/results/sim2/pertnet/', 
-'/home/agheerae/results/sim3/pertnet/', '/home/agheerae/results/sim4/pertnet/']
+L_path = ['/home/agheerae/results/sim1/pertnet/', '/home/agheerae/results/timewin_0/pertnet/', '/home/agheerae/results/timewin_100/pertnet/', 
+'/home/agheerae/results/timewin_200/pertnet/', '/home/agheerae/results/timewin_300/pertnet/', '/home/agheerae/results/timewin_400/pertnet/', '/home/agheerae/results/timewin_500/pertnet/']
 L_excel = []
 
 for filepath in L_path:
@@ -27,19 +27,19 @@ f = plt.figure()
 for i, sim in enumerate(sims):
     color = next(colors)
     if i ==0:
-        lines.append(mlines.Line2D([], [], color=color, label='Average of 4'))
+        lines.append(mlines.Line2D([], [], color=color, label='Simulation 1'))
     else:
-        lines.append(mlines.Line2D([], [], color=color, label='Simulation '+str(i)))
+        lines.append(mlines.Line2D([], [], color=color, label='Time window '+str((i-1)*100)+'-'+str((i+4)*100)+'ns'))
     for cutoff in L_cutoffs:
         marker = next(markers)
         plt.plot(range(thresh_max), sim[cutoff-3,:thresh_max], c=color, marker=marker) 
         if i == 0:      
-            lines.append(mlines.Line2D([], [], color='black', marker=marker, label='Cutoff '+str(cutoff)+'A'))
+            lines.append(mlines.Line2D([], [], color='black', marker=marker, label='Cutoff '+str(cutoff)+'Å'))
 
 plt.xlabel('Threshold')
 plt.ylabel('Total number of nodes in the perturbation network')
 plt.legend(handles=lines)
-plt.savefig('/home/agheerae/results/all_sims_nodes_tot.pdf')
+plt.savefig('/home/agheerae/results/time_windows_nodes_tot.pdf')
 
 
 
