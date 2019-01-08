@@ -48,5 +48,6 @@ with open(args.output, 'w') as output:
                 except:
                     print(u, v)
         output.write('draw color 2 \n')
-        for u in zip(net1.nodes(), net2.nodes()):
-            output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')
+        for net in [net1, net2]:
+            for u in net.nodes():
+                output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')

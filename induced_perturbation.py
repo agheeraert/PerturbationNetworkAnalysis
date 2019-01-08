@@ -2,15 +2,15 @@ import networkx as nx
 from os import path, listdir
 import matplotlib.pyplot as plt
 
-perturbation_folder = '/home/agheerae/results/sim1/node_pertnet/'
-output_folder = '/home/agheerae/results/sim1/node_induced/'
+perturbation_folder = '/home/agheerae/results/avg_sims/pertnet/'
+output_folder = '/home/agheerae/results/avg_sims/induced/'
 log = path.join(output_folder, 'not_in_net.log')
-root_nodes = ['K19:F', 'C84:H']
+root_nodes = ['R249:F']
 L_cutoffs = list(range(3, 10))
 chain1='F'
 chain2='H'
 
-nodes = True
+nodes = False
 
 
 for cutoff in L_cutoffs:

@@ -7,7 +7,7 @@ from matplotlib.markers import MarkerStyle
 import itertools
 import pickle as pkl
 from tqdm import tqdm
-base_dir = '/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/prfar'
+base_dir = '/home/agheerae/Python/PerturbationNetworkAnalysis/data/sim1/apo'
 colors = itertools.cycle(('r', 'g', 'b', 'tab:orange', 'tab:purple', 'y', 'm', 'c', 'tab:pink', 'tab:olive'))
 
 def cutoff_needeed(frame, ref_node, cutoff_min=2, cutoff_max=14, step=0.1, L_neighbors=None):
@@ -48,7 +48,7 @@ plt.xlabel('Time in frame (1 frame=1/10ns)')
 plt.ylabel('Cutoff needed to see the neighbor')
 plt.ylim(0,10)
 plt.legend(handles=lines)
-plt.savefig('/home/agheerae/results/time_evolution_neighbors.pdf')
+plt.savefig('/home/agheerae/results/time_evolution_neighbors_apo.pdf')
     
 
 

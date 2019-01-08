@@ -47,19 +47,20 @@ class AlignPerturbation():
 
     def alnParser(self):
         with open(self.alnpath, 'r') as aln_file:
-            chain1, chain2, one2two = None, None, None
+            chain1, chain2 = [], []
             for line in aln_file:
                 words = line.split()
                 if words:
                     if words[0:2] == ['Chain', '1:']:
-                        chain1 = [aa + str(i) + ':' + self.id1 for i, aa in enumerate(list(words[3]), int(words[2]))]
+                        c = 0
+                        for i, aa in enumerate(list(words[3]), int(words[2])):
+                            if aa == '-':
+                                c+=1
+                            chain1.append(aa + str(i-c) + ':' + self.id1)
                     if words[0:2] == ['Chain', '2:']:
-                        chain2 = [aa + str(i) + ':' + self.id2 for i, aa in enumerate(list(words[3]), int(words[2]))]
-                if chain1 and chain2:
-                    if not one2two:
-                        one2two = dict(zip(chain1, chain2))
-                    else:
-                        one2two.update(dict(zip(chain1, chain2)).items())
+                        for i, aa in enumerate(list(words[3]), int(words[2])):
+                            chain2.append(aa + str(i) + ':' + self.id2)
+        one2two = dict(zip(chain1, chain2))
         one2two = self.remove_dic(one2two)
         two2one = dict(zip(one2two.values(), one2two.keys()))
         return one2two, two2one
@@ -137,5 +138,5 @@ class AlignPerturbation():
 if __name__ == '__main__':
     for chain in ['C', 'D']:
         for cutoff in range(3, 10):
-            AlignPerturbation(pdb1 = '/home/agheerae/Python/PerturbationNetworkAnalysis/data/aligned_tmaritima_yeast/1GPW_apo_x-ray.pdb', pdb2='/home/agheerae/Python/PerturbationNetworkAnalysis/data/aligned_tmaritima_yeast/apo_1OX6_chainA_alig.pdb', id1='A', id2=chain, alnpath='/home/agheerae/Python/PerturbationNetworkAnalysis/data/aligned_tmaritima_yeast/'+chain+'.aln', cutoff=cutoff).draw_perturbation(threshold=range(0,100), output='/home/agheerae/results/comp_bacteria_yeast/'+chain+'/cutoff_'+str(cutoff))
+            AlignPerturbation(pdb2 = '/home/agheerae/Python/PerturbationNetworkAnalysis/data/aligned_tmaritima_yeast/1GPW_apo_x-ray.pdb', pdb1='/home/agheerae/Python/PerturbationNetworkAnalysis/data/aligned_tmaritima_yeast/apo_1OX6_chainA_alig.pdb', id2='A', id1=chain, alnpath='/home/agheerae/Python/PerturbationNetworkAnalysis/data/aligned_tmaritima_yeast/'+chain+'.aln', cutoff=cutoff).draw_perturbation(threshold=range(0,100), output='/home/agheerae/results/comp_bacteria_yeast/reverse/'+chain+'/cutoff_'+str(cutoff))
 

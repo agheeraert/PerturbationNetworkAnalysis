@@ -54,6 +54,9 @@ with open(args.output, 'w') as output:
                 output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
             else:
                 output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+'1 \n')
+        
+        output.write('draw color 2 \n')
+     
         for u in A.nodes():
             if args.node:
                 if A.nodes(data=True)[u]['color']=='g':
