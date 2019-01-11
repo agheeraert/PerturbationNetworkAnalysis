@@ -17,6 +17,11 @@ class CreateNetwork:
         self.three2one = dict(zip(aa3, aa1))
         self.one2three = dict(zip(aa1, aa3))
         self.three2one['5CS'] = 'C'
+        self.three2one['HIP'] = 'H'
+        self.three2one['HID'] = 'H'
+        self.three2one['HIE'] = 'H'
+        self.three2one['GLH'] = 'E'
+        self.three2one['ASH'] = 'D'
         self.cutoff = cutoff
 
     def create(self, pdb):
