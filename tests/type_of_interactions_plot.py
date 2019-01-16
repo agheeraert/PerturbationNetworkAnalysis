@@ -6,6 +6,7 @@ import numpy as np
 import itertools
 import matplotlib.lines as mlines
 import pickle as pkl
+import pandas as pd
 
 BASE_FOLDER = '/home/agheerae/results/sidechain_H/pertnet/'
 OUT_FOLDER = '/home/agheerae/results/type_of_interactions/sidechain_H/'
@@ -18,6 +19,7 @@ tuple_residues = [(['R', 'K'], '+'),
 aa_list = [aa for tup in tuple_residues for aa in tup[0]]
 q = len(aa_list)
 aa_to_id = dict(zip(aa_list, range(q)))
+n_top_unknown = 10
 
 dict_residues = {}
 for tup in tuple_residues:
@@ -42,8 +44,8 @@ dict_interactions = {('+', '-'): 'sb',
 
 for cutoff in range(5, 6):
     folder = jn(BASE_FOLDER, 'cutoff_'+str(cutoff))
-    last_cutoff = (len(listdir(folder))-1)/2
-    L_threshs = range(0, int(last_cutoff)+1)
+    last_cutoff = int((len(listdir(folder))-1)/2)
+    L_threshs = range(0, last_cutoff+1)
     unknown_pairs = []
     known_pairs = []
     interactions_count = {'sb': ((L_threshs[-1]+1)*[0], "Salt bridge"),
@@ -93,11 +95,8 @@ for cutoff in range(5, 6):
 
     f.legend(handles=lines, loc='upper left', fontsize=8)
     plt.savefig(jn(OUT_FOLDER, 'type_of_interactions_'+str(cutoff)+'.svg'))
-    # pos = np.arange(len(unknown_pairs.keys()))
-    # width = 1
-    # ax.set_xticks(pos + width / 2)
-    # ax.set_xticklabels(unknown_pairs.keys())
-    # plt.bar(pos, unknown_pairs.values(), width, color='g')
+    
+    L_top_unknown = []
     for i, elt in enumerate(unknown_pairs):
         f = plt.figure()
         mat = np.zeros([q, q])
@@ -118,4 +117,17 @@ for cutoff in range(5, 6):
         plt.xticks(range(q), aa_list)
         plt.yticks(range(q), aa_list)
         plt.savefig(jn(OUT_FOLDER, 'all_pairs_'+str(cutoff)+'_'+str(i)+'.svg'))
-        print(i, sorted(unknown_pairs[i], key=unknown_pairs[i].get, reverse=True)[:10])
+        _L_top_unknown = []
+        for j, tup in enumerate(sorted(unknown_pairs[i], key=unknown_pairs[i].get, reverse=True)[:n_top_unknown]):
+            _L_top_unknown.extend([tup, unknown_pairs[i][tup]])
+            net = nx.read_gpickle(jn(folder, str(cutoff)+'_'+str(i)+'.p'))
+            avg = 0
+            for u, v in net.edges():
+                if (u[0], v[0]) == tup or (v[0], u[0]) == tup:
+                    avg += net.get_edge_data(u, v)['weight']
+                    print(u, v, net.get_edge_data(u, v)['weight'])
+            avg /= unknown_pairs[i][tup]
+            _L_top_unknown.append(avg)
+        L_top_unknown.append(_L_top_unknown)
+    df = pd.DataFrame(L_top_unknown, index=range(last_cutoff+1))
+    df.to_csv(OUT_FOLDER+'top_unknown.csv')

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import itertools
 from Bio.PDB.Polypeptide import aa1, aa3
 from Bio.PDB import PDBParser
-from math import sqrt
+from math import sqrt, copysign
 import warnings
 import argparse
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
@@ -25,13 +25,25 @@ args = parser.parse_args()
 
 structure = PDBParser().get_structure('X', args.pdb)[0]
 pos = {}
+L_pos = []
+distance_thresh = 1.5
 for atom in structure.get_atoms():
     if atom.id == 'CA':
         residue = atom.parent
         if residue.resname in three2one:
                 y = atom.coord[1]
                 x = sqrt(2)*atom.coord[2] - sqrt(2)*atom.coord[0]
+                not_placed = True
+                while not_placed:
+                    not_placed = False
+                    for position in L_pos:
+                        if abs(x-position[0]) < distance_thresh and abs(y-position[1]) < distance_thresh:
+                            not_placed = True
+                            x += copysign(distance_thresh, x-position[0])
+                            y += copysign(distance_thresh, y-position[0])
+
                 pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = (x, y)
+                L_pos.append((x, y))
 
 output_str1 = args.path.split('_')[0]
 if args.r:
@@ -55,9 +67,16 @@ while not empty:
         width = list(nx.get_edge_attributes(net, 'weight').values())
         max_width = max(width)
         for i, elt in enumerate(width):
-            width[i] = elt/max_width*2
-        weights = {(u, v): round(nx.get_edge_attributes(net, 'weight')[(u,v)], 2) for (u, v) in nx.get_edge_attributes(net, 'weight')}
-        nx.draw(net, with_labels=True, font_weight='bold', width=width, pos=pos, edge_color=colors, node_size=100, node_color='grey', font_size=8)
+            width[i] = elt/max_width*5
+        weights = {(u, v): round(nx.get_edge_attributes(net, 'weight')[(u,v)]) for (u, v) in nx.get_edge_attributes(net, 'weight')}
+        node_colors = []
+        for node in net.nodes():
+            if node[-1] == 'F':
+                node_colors.append((212, 212, 212))
+            else:
+                node_colors.append((71, 71, 71))
+
+        nx.draw(net, labels={node: node[:-2] for node in net.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_color=node_colors, font_size=8)
         nx.draw_networkx_edge_labels(net, pos=pos, edge_labels=weights, font_color='black', font_size=5)
         thresh = str(round(threshold, 1)).replace('.', '-')
         if not args.r:
