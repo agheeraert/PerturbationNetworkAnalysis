@@ -68,15 +68,15 @@ for cutoff in L_cutoffs:
                         width[i] = elt/max_width*5
                     weights = {(u, v): round(nx.get_edge_attributes(tree, 'weight')[(u,v)]) for (u, v) in nx.get_edge_attributes(tree, 'weight')}
                     colors = list(nx.get_edge_attributes(tree, 'color').values())
-                    # for i, color in enumerate(colors):
-                    #     if color == 'g':
-                    #         colors[i] = 'dodgerblue'                
+                    for i, color in enumerate(colors):
+                        if color == 'g':
+                            colors[i] = 'dodgerblue'                
                     width = list(nx.get_edge_attributes(tree, 'weight').values())
                     max_width = max(width)
                     for i, elt in enumerate(width):
                         width[i] = elt/max_width*5
                     weights = {(u, v): round(nx.get_edge_attributes(tree, 'weight')[(u,v)]) for (u, v) in nx.get_edge_attributes(tree, 'weight')}
-                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='d', font_size=7, node_color='lightgrey', linewidths=1)
-                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=7, node_color='lightgrey', linewidths=0)
+                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=7, node_color='lightgrey')
+                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=7, node_color='lightgrey')
                     nx.draw_networkx_edge_labels(tree, pos=pos, edge_labels=weights, font_color='black', font_size=5)
                     plt.savefig(out_path+'.pdf')
