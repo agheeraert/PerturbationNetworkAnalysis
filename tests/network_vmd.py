@@ -18,6 +18,9 @@ parser.add_argument('-nc',  type=bool, default=False,
                     help='the network has no edge color attribute')      
 parser.add_argument('-ntodraw', type=str, nargs='+', default=None,
                     help="draw only a list of nodes")              
+parser.add_argument('-norm', type=float, default=1.5,
+                    help="changes the normalizaton factor")              
+
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
@@ -25,7 +28,7 @@ three2one['5CS'] = 'C'
 A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
 color = not args.nc
-div = max(nx.get_edge_attributes(A, 'weight').values())/1.5
+div = max(nx.get_edge_attributes(A, 'weight').values())/args.norm
 
 node2CA = {}
 for atom in structure.get_atoms():
@@ -66,6 +69,6 @@ with open(args.output, 'w') as output:
         for u in A.nodes():
             if args.ntodraw:
                 if u in args.ntodraw:
-                    output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')
+                    output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
             else:
-                output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1.5 \n')
+                output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')

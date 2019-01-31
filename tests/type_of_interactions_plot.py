@@ -9,8 +9,8 @@ import matplotlib
 import pickle as pkl
 import pandas as pd
 
-BASE_FOLDER = '/home/agheerae/results/H/pertnet/'
-OUT_FOLDER = '/home/agheerae/results/type_of_interactions/with_H/'
+BASE_FOLDER = '/home/agheerae/results/avg_sims/pertnet/'
+OUT_FOLDER = '/home/agheerae/results/type_of_interactions/without_H/'
 colors = itertools.cycle(('r', 'g', 'b', 'olive', 'purple', 'navy'))   # 'purple',  between olive and navy
 tuple_residues = [(['R', 'K'], '+'),
                 (['D', 'E'], '-'),
@@ -41,12 +41,12 @@ dict_interactions = {('+', '-'): 'sb',
                     ('h', 'h'): 'h',
                     ('p', 'p'): 'p'
 }
-matplotlib.rcParams['font.family'] = "serif"
+# matplotlib.rcParams['font.family'] = "serif"
 
 for cutoff in range(5, 6):
     folder = jn(BASE_FOLDER, 'cutoff_'+str(cutoff))
     last_cutoff = int((len(listdir(folder))-1)/3)
-    L_threshs = range(0, 31)
+    L_threshs = range(0, 9)
     unknown_pairs = []
     known_pairs = []
     interactions_count = {'sb': ((L_threshs[-1]+1)*[0], "Salt bridge"),
