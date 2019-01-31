@@ -37,10 +37,6 @@ class CreateNetwork:
         residues, bad_nodes = [], []
         for residue in self.structure.get_residues():
             residues.append(self.three2one[residue.resname])
-        #     else:
-        #         bad_nodes.append(residue.parent.id+str(residue.id[1]))
-        # self.net.remove_nodes_from(bad_nodes)
-        # print(bad_nodes)
         old_labels = self.net.nodes
         labels = [a+b[1:]+':'+b[0] for a,b in zip(residues, old_labels)]
         mapping = dict(zip(old_labels, labels))
@@ -88,4 +84,5 @@ class CreateNetwork:
         nx.draw(net, with_labels=True, font_weight='bold')
 
 if __name__ == '__main__':
-    CreateNetwork().create_average('data/apo_all/')
+    sim_folders = ['sim'+str(i) for i in range(2, 5)]
+    CreateNetwork().save('/home/agheerae/PDB/1GPW_cd_nochain.pdb', '/home/agheerae/results/teee.p')

@@ -5,17 +5,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 import matplotlib.lines as mlines
+import matplotlib
 import pickle as pkl
 import pandas as pd
 
-BASE_FOLDER = '/home/agheerae/results/sidechain_H/pertnet/'
-OUT_FOLDER = '/home/agheerae/results/type_of_interactions/sidechain_H/'
+BASE_FOLDER = '/home/agheerae/results/H/pertnet/'
+OUT_FOLDER = '/home/agheerae/results/type_of_interactions/with_H/'
 colors = itertools.cycle(('r', 'g', 'b', 'olive', 'purple', 'navy'))   # 'purple',  between olive and navy
 tuple_residues = [(['R', 'K'], '+'),
                 (['D', 'E'], '-'),
                 (['S', 'T', 'N', 'Q', 'Y', 'H'], 'p'),
-                (['G', 'A', 'P'], '?'),
-                (['V', 'I', 'L', 'M', 'F', 'W', 'C'], 'h')]
+                (['I', 'L', 'V', 'M', 'F', 'W', 'C', 'P', 'G', 'A'], 'h')]
 aa_list = [aa for tup in tuple_residues for aa in tup[0]]
 q = len(aa_list)
 aa_to_id = dict(zip(aa_list, range(q)))
@@ -41,19 +41,20 @@ dict_interactions = {('+', '-'): 'sb',
                     ('h', 'h'): 'h',
                     ('p', 'p'): 'p'
 }
+matplotlib.rcParams['font.family'] = "serif"
 
 for cutoff in range(5, 6):
     folder = jn(BASE_FOLDER, 'cutoff_'+str(cutoff))
-    last_cutoff = int((len(listdir(folder))-1)/2)
-    L_threshs = range(0, last_cutoff+1)
+    last_cutoff = int((len(listdir(folder))-1)/3)
+    L_threshs = range(0, 31)
     unknown_pairs = []
     known_pairs = []
     interactions_count = {'sb': ((L_threshs[-1]+1)*[0], "Salt bridge"),
-        'un_sb': ((L_threshs[-1]+1)*[0], "Unknown salt bridge"),
-        'h': ((L_threshs[-1]+1)*[0], "Hydrophobic interaction"),
-        'p': ((L_threshs[-1]+1)*[0], "Polar-polar interaction"),
-        '?': ((L_threshs[-1]+1)*[0], "Unknown interaction"),
-        'c': ((L_threshs[-1]+1)*[0], "Residues covalently bound"),
+        'un_sb': ((L_threshs[-1]+1)*[0], "Same charge"),
+        'h': ((L_threshs[-1]+1)*[0], "Hydrophobic"),
+        'p': ((L_threshs[-1]+1)*[0], "Polar"),
+        '?': ((L_threshs[-1]+1)*[0], "Non-specific"),
+        'c': ((L_threshs[-1]+1)*[0], "Covalently bound"),
                 }
     c_tot = (L_threshs[-1]+1)*[0]
     for threshold in L_threshs:
@@ -85,16 +86,21 @@ for cutoff in range(5, 6):
     lines = []
     f = plt.figure()
     ax = f.add_subplot(111)
-    ax.set_title('Cutoff '+str(cutoff)+' Å')
     ax.set_xlabel('Threshold')
-    ax.set_ylabel(ylabel='Percentage of interaction highlighted by the perturbation network')
+    ax.set_ylabel(ylabel='Percentage of interactions in the perturbation network')
     for elt in interactions_count:
         color = next(colors)
         lines.append(mlines.Line2D([], [], color=color, label=interactions_count[elt][1]))
         ax.plot(L_threshs, interactions_count[elt][0], c=color)
-
-    f.legend(handles=lines, loc='upper left', fontsize=8)
-    plt.savefig(jn(OUT_FOLDER, 'type_of_interactions_'+str(cutoff)+'.svg'))
+    ax2 = ax.twinx()
+    ax2.semilogy(L_threshs, c_tot, color='black')
+    lines.append(mlines.Line2D([], [], color='black', label='Total'))
+    ax2.set_ylabel(ylabel='Number of interactions in the perturbation network')
+    ax.grid(linestyle='--')
+    f.legend(handles=lines, loc='upper center', fontsize=8, bbox_to_anchor=(0.4, 1),
+          ncol=2, fancybox=True, shadow=True)
+    plt.tight_layout()
+    plt.savefig(jn(OUT_FOLDER, 'type_of_interactions_article2_'+str(cutoff)+'.png'))
     
     L_top_unknown = []
     for i, elt in enumerate(unknown_pairs):
@@ -107,16 +113,16 @@ for cutoff in range(5, 6):
         plt.colorbar()
         plt.xticks(range(q), aa_list)
         plt.yticks(range(q), aa_list)
-        plt.savefig(jn(OUT_FOLDER, 'unknown_pairs_'+str(cutoff)+'_'+str(i)+'.svg'))
+        plt.savefig(jn(OUT_FOLDER, 'unknown_pairs_'+str(cutoff)+'_'+str(i)+'.png'))
         f = plt.figure()
         for u, v in known_pairs[i]:
             mat[(aa_to_id[u], aa_to_id[v])] += known_pairs[i][(u, v)]
             mat[(aa_to_id[v], aa_to_id[u])] += known_pairs[i][(u, v)]
         plt.imshow(mat, cmap = 'Reds')
         plt.colorbar()
-        plt.xticks(range(q), aa_list)
-        plt.yticks(range(q), aa_list)
-        plt.savefig(jn(OUT_FOLDER, 'all_pairs_'+str(cutoff)+'_'+str(i)+'.svg'))
+        plt.xticks(range(q), aa_list, family='serif')
+        plt.yticks(range(q), aa_list, family='serif')
+        plt.savefig(jn(OUT_FOLDER, 'all_pairs_'+str(cutoff)+'_'+str(i)+'.png'))
         _L_top_unknown = []
         for j, tup in enumerate(sorted(unknown_pairs[i], key=unknown_pairs[i].get, reverse=True)[:n_top_unknown]):
             _L_top_unknown.extend([tup, unknown_pairs[i][tup]])
@@ -125,9 +131,8 @@ for cutoff in range(5, 6):
             for u, v in net.edges():
                 if (u[0], v[0]) == tup or (v[0], u[0]) == tup:
                     avg += net.get_edge_data(u, v)['weight']
-                    print(u, v, net.get_edge_data(u, v)['weight'])
             avg /= unknown_pairs[i][tup]
             _L_top_unknown.append(avg)
         L_top_unknown.append(_L_top_unknown)
     df = pd.DataFrame(L_top_unknown, index=range(last_cutoff+1))
-    df.to_csv(OUT_FOLDER+'top_unknown.csv')
+    df.to_csv(OUT_FOLDER+'top_unknown_article_2.csv')
