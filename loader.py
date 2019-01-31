@@ -45,7 +45,6 @@ def split(pos, d_thresh, n_max=100):
 
 structure = PDBParser().get_structure('X', args.pdb)[0]
 pos = {}
-L_pos = []
 distance_thresh = 1
 for atom in structure.get_atoms():
     if atom.id == 'CA':
@@ -54,15 +53,7 @@ for atom in structure.get_atoms():
         if residue.resname in three2one:
                 y = (0.1822020302*atom.coord[0] + 0.6987674421*atom.coord[1] - 0.6917560857*atom.coord[2])*(1-0.3*c)
                 x = 0.9980297273*atom.coord[0]+ 0.0236149631*atom.coord[1]+ 0.05812914*atom.coord[2]
-                # not_placed = True
-                # while not_placed:
-                #     not_placed = False
-                #     for position in L_pos:
-                #         if abs(y-position[1]) < distance_thresh:
-                #             not_placed = True
-                #             y += 0.1*y*c
                 pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = (x, y)
-                # L_pos.append((x, y))
 
 output_str1 = args.path.split('_')[0]
 if args.r:

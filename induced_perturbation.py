@@ -18,24 +18,15 @@ chain2='H'
 pdb = '/home/agheerae/Article/base_IGPS.pdb'
 structure = PDBParser().get_structure('X', pdb)[0]
 pos = {}
-L_pos = []
+distance_thresh = 1
 for atom in structure.get_atoms():
     if atom.id == 'CA':
         residue = atom.parent
+        c = 1*(residue.parent.id == 'H')
         if residue.resname in three2one:
-                y = 0.91*atom.coord[1] + 0.09*(atom.coord[0]+atom.coord[2])
-                x = - sqrt(2)*atom.coord[2] - sqrt(2)*atom.coord[0] + 0.11*atom.coord[1]
-                not_placed = True
-                while not_placed:
-                    not_placed = False
-                    for position in L_pos:
-                        if abs(x-position[0]) < distance_thresh and abs(y-position[1]) < distance_thresh:
-                            not_placed = True
-                            x += copysign(distance_thresh, x-position[0])
-                            y += copysign(distance_thresh, y-position[0])
-
+                y = (0.1822020302*atom.coord[0] + 0.6987674421*atom.coord[1] - 0.6917560857*atom.coord[2])*(1-0.3*c)
+                x = 0.9980297273*atom.coord[0]+ 0.0236149631*atom.coord[1]+ 0.05812914*atom.coord[2]
                 pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = (x, y)
-                L_pos.append((x, y))
 
 
 for cutoff in L_cutoffs:
