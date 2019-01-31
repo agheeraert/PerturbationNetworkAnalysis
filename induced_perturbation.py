@@ -11,15 +11,14 @@ warnings.simplefilter('ignore', PDBConstructionWarning)
 three2one = dict(zip(aa3, aa1))
 perturbation_folder = '/home/agheerae/results/backbone/pertnet/'
 output_folder = '/home/agheerae/results/backbone/induced/'
-root_nodes = ['P10:H']
+root_nodes = ['S225:F']
 L_cutoffs = list(range(5, 6))
 chain1='F'
 chain2='H'
-pdb = '/home/agheerae/Python/PerturbationNetworkAnalysis/data/apo_all/1frame_1.pdb'
+pdb = '/home/agheerae/Article/base_IGPS.pdb'
 structure = PDBParser().get_structure('X', pdb)[0]
 pos = {}
 L_pos = []
-distance_thresh = 1
 for atom in structure.get_atoms():
     if atom.id == 'CA':
         residue = atom.parent
