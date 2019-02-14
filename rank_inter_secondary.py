@@ -18,9 +18,7 @@ parser = argparse.ArgumentParser(description='Load a graph and ranks the interac
 parser.add_argument('path',  type=str,
                      help='file to load')
 parser.add_argument('output',  type=str,
-                     help='output directory')
-parser.add_argument('-pdb',  type=str, default='/home/agheerae/Python/PerturbationNetworkAnalysis/data/apo_all/1frame_1.pdb',
-                     help='file structure to draw on')
+                     help='output path')
 
 args = parser.parse_args()
 
@@ -86,34 +84,30 @@ for j in range(454):
         if still:
             still = False
             new = True
-print(sec_all)
-# node_to_sec = {}
+node_to_sec = {}
 
-# for node in net.nodes():
-#     if node[-1] == 'H':
-#         c = 252
-#     else:
-#         c = -1
-#     if c+int(node[1:-2]) in sec_all:
-#         node_to_sec[node] = sec_all[c+int(node[1:-2])]
-#     else:
-#         node_to_sec[node] = 'unknown'
+for node in net.nodes():
+    if node[-1] == 'H':
+        c = 252
+    else:
+        c = -1
+    if c+int(node[1:-2]) in sec_all:
+        node_to_sec[node] = sec_all[c+int(node[1:-2])]
+    else:
+        node_to_sec[node] = 'unknown'
 
-# print(node_to_sec)
+print(node_to_sec)
 
-# c_inter_sec = {}
-# for u, v in net.edges():
-#     w = net.get_edge_data(u, v)['weight']
-#     sec_sec = (node_to_sec[u], node_to_sec[v])
-#     if sec_sec in c_inter_sec:
-#         c_inter_sec[sec_sec] +=w
-#     elif sec_sec[::-1] in c_inter_sec:
-#         c_inter_sec[sec_sec[::-1]] = w
-#     else:
-#         c_inter_sec[sec_sec] = w
-# # print(sorted(c_inter_sec, key=c_inter_sec.get, reverse=True))
-# df = pd.DataFrame(c_inter_sec, index=[0]).T.sort_values(0, axis=0, ascending=False)
-# df.to_excel(args.output)
-
-
-
+c_inter_sec = {}
+for u, v in net.edges():
+    w = net.get_edge_data(u, v)['weight']
+    sec_sec = (node_to_sec[u], node_to_sec[v])
+    if sec_sec in c_inter_sec:
+        c_inter_sec[sec_sec] +=w
+    elif sec_sec[::-1] in c_inter_sec:
+        c_inter_sec[sec_sec[::-1]] = w
+    else:
+        c_inter_sec[sec_sec] = w
+# print(sorted(c_inter_sec, key=c_inter_sec.get, reverse=True))
+df = pd.DataFrame(c_inter_sec, index=[0]).T.sort_values(0, axis=0, ascending=False)
+df.to_excel(args.output)

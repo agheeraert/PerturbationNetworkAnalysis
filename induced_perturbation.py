@@ -9,9 +9,9 @@ from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
 three2one = dict(zip(aa3, aa1))
-perturbation_folder = '/home/agheerae/results/backbone/pertnet/'
-output_folder = '/home/agheerae/results/backbone/induced/'
-root_nodes = ['S225:F']
+perturbation_folder = '/home/agheerae/results/H/pertnet/'
+output_folder = '/home/agheerae/results/H/induced/'
+root_nodes = ['L50:F', 'V48:F', 'I52:F']
 L_cutoffs = list(range(5, 6))
 chain1='F'
 chain2='H'
@@ -66,7 +66,6 @@ for cutoff in L_cutoffs:
                     for i, elt in enumerate(width):
                         width[i] = elt/max_width*5
                     weights = {(u, v): round(nx.get_edge_attributes(tree, 'weight')[(u,v)]) for (u, v) in nx.get_edge_attributes(tree, 'weight')}
-                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=7, node_color='lightgrey')
-                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=7, node_color='lightgrey')
-                    nx.draw_networkx_edge_labels(tree, pos=pos, edge_labels=weights, font_color='black', font_size=5)
+                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
+                    nx.draw(tree, font_weight='bold', nodelist=[node for node in tree.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in tree.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
                     plt.savefig(out_path+'.pdf')
