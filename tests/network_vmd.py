@@ -18,9 +18,6 @@ parser.add_argument('-nc',  type=bool, default=False,
                     help='the network has no edge color attribute')      
 parser.add_argument('-ntodraw', type=str, nargs='+', default=None,
                     help="draw only a list of nodes")              
-parser.add_argument('-norm', type=float, default=1.5,
-                    help="changes the normalizaton factor")              
-
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
@@ -28,7 +25,7 @@ three2one['5CS'] = 'C'
 A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
 color = not args.nc
-div = max(nx.get_edge_attributes(A, 'weight').values())/args.norm
+div = max(nx.get_edge_attributes(A, 'weight').values())/1
 
 node2CA = {}
 for atom in structure.get_atoms():
@@ -44,16 +41,17 @@ with open(args.output, 'w') as output:
             output.write('draw color 1 \n')
         else:
             output.write('draw color 6 \n')
-        previous = None
+        red = None
         for u, v in A.edges():
             if color:
-                red = A.get_edge_data(u, v)['color']=='r'
-                if previous != red:
-                    if not red: 
-                        output.write('draw color 23 \n')
-                    else:
-                        output.write('draw color 1 \n')
-                previous = red    
+                if red is None and A.get_edge_data(u, v)['color']=='':
+                    red = A.get_edge_data(u, v)['color']=='r'
+                if A.get_edge_data(u, v)['color']=='g' and red:
+                    output.write('draw color 23 \n')
+                    red=False
+                elif A.get_edge_data(u, v)['color']=='r'and not red:
+                    output.write('draw color 1 \n')
+                    red=True
                 if args.ntodraw:
                     if u in args.ntodraw and v in args.ntodraw:
                         output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
@@ -63,12 +61,13 @@ with open(args.output, 'w') as output:
                 if args.ntodraw:
                     if u in args.ntodraw and v in args.ntodraw:
                         output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
-
+                else:
+                    output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
         output.write('draw color 2 \n')
      
         for u in A.nodes():
             if args.ntodraw:
                 if u in args.ntodraw:
-                    output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
+                    output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1 \n')
             else:
-                output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
+                output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius 1 \n')

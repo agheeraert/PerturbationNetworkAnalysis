@@ -9,8 +9,8 @@ import matplotlib
 import pickle as pkl
 import pandas as pd
 
-BASE_FOLDER = '/home/agheerae/results/avg_sims/pertnet/'
-OUT_FOLDER = '/home/agheerae/results/type_of_interactions/without_H/'
+BASE_FOLDER = '/home/agheerae/results/backbone/pertnet/'
+OUT_FOLDER = '/home/agheerae/results/cutoff_analysis/type_of_interactions/backbone/'
 colors = itertools.cycle(('orange', 'g', 'b', 'magenta', 'r', 'black'))   # 'purple',  between olive and navy
 tuple_residues = [(['R', 'K'], '+'),
                 (['D', 'E'], '-'),
@@ -43,7 +43,7 @@ dict_interactions = {('+', '-'): 'sb',
 }
 # matplotlib.rcParams['font.family'] = "serif"
 if __name__ =='__main__':
-    for cutoff in range(5, 6):
+    for cutoff in range(3, 10):
         folder = jn(BASE_FOLDER, 'cutoff_'+str(cutoff))
         last_cutoff = int((len(listdir(folder))-1)/3)
         L_threshs = range(0, 9)
@@ -135,5 +135,5 @@ if __name__ =='__main__':
                 avg /= unknown_pairs[i][tup]
                 _L_top_unknown.append(avg)
             L_top_unknown.append(_L_top_unknown)
-        df = pd.DataFrame(L_top_unknown, index=range(last_cutoff+1))
-        df.to_csv(OUT_FOLDER+'top_unknown_article_2.csv')
+        #df = pd.DataFrame(L_top_unknown, index=range(last_cutoff+1))
+        #df.to_csv(OUT_FOLDER+'top_unknown_article_2.csv')
