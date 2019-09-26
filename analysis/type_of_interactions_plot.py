@@ -9,8 +9,8 @@ import matplotlib
 import pickle as pkl
 import pandas as pd
 
-BASE_FOLDER = '/home/agheerae/results/backbone/pertnet/'
-OUT_FOLDER = '/home/agheerae/results/cutoff_analysis/type_of_interactions/backbone/'
+BASE_FOLDER = '/home/agheerae/results/H/pertnet/'
+OUT_FOLDER = '/home/agheerae/results/cutoff_analysis/type_of_interactions/newplot/H/'
 colors = itertools.cycle(('orange', 'g', 'b', 'magenta', 'r', 'black'))   # 'purple',  between olive and navy
 tuple_residues = [(['R', 'K'], '+'),
                 (['D', 'E'], '-'),
@@ -46,22 +46,34 @@ if __name__ =='__main__':
     for cutoff in range(3, 10):
         folder = jn(BASE_FOLDER, 'cutoff_'+str(cutoff))
         last_cutoff = int((len(listdir(folder))-1)/3)
-        L_threshs = range(0, 9)
+        if cutoff == 2: #FLAG3
+            L_threshs = sorted([float(file.split('_')[1].split('.')[0].replace('-','.')) for file in listdir('/home/agheerae/results/H/pertnet/cutoff_3/') if file[-1]=='p'])
+        else:
+            L_threshs = sorted([int(file.split('_')[1].split('.')[0]) for file in listdir('/home/agheerae/results/H/pertnet/cutoff_'+str(cutoff)+'/') if file[-1]=='p'])
         unknown_pairs = []
         known_pairs = []
-        interactions_count = {'sb': ((L_threshs[-1]+1)*[0], "Different charge (salt bridge)"),
-            'un_sb': ((L_threshs[-1]+1)*[0], "Same charge"),
-            'h': ((L_threshs[-1]+1)*[0], "Hydrophobic"),
-            'p': ((L_threshs[-1]+1)*[0], "Polar"),
-            '?': ((L_threshs[-1]+1)*[0], "Non-specific"),
-            'c': ((L_threshs[-1]+1)*[0], "Covalently bound"),
+        interactions_count = {'sb': ((len(L_threshs))*[0], "Different charge (salt bridge)"),
+            'un_sb': ((len(L_threshs))*[0], "Same charge"),
+            'h': ((len(L_threshs))*[0], "Hydrophobic"),
+            'p': ((len(L_threshs))*[0], "Polar"),
+            '?': ((len(L_threshs))*[0], "Non-specific"),
+            'c': ((len(L_threshs))*[0], "Covalently bound"),
                     }
-        c_tot = (L_threshs[-1]+1)*[0]
+        c_tot = (len(L_threshs))*[0]
         for threshold in L_threshs:
+            if cutoff == 2: #FLAG3
+                thresh_str = str(threshold).replace('.', '-')
+                if threshold == 1.0:
+                    thresh_str = '1'
+                elif threshold == 0.0:
+                    thresh_str = '0'  
+                threshold = int(threshold*10)
+            else:
+                thresh_str = str(threshold)
             _unknown_pairs = {}
             _known_pairs = {}
-            if str(cutoff)+'_'+str(threshold)+'.p' in listdir(folder):
-                net = nx.read_gpickle(jn(folder, str(cutoff)+'_'+str(threshold)+'.p'))
+            if str(cutoff)+'_'+thresh_str+'.p' in listdir(folder):
+                net = nx.read_gpickle(jn(folder, str(cutoff)+'_'+thresh_str+'.p'))
                 for u, v in net.edges():
                     if abs(int(u[1:].split(':')[0]) - int(v[1:].split(':')[0])) == 1:
                         interaction = 'c'
@@ -87,7 +99,7 @@ if __name__ =='__main__':
         f = plt.figure()
         ax = f.add_subplot(111)
         ax.tick_params(labelsize='large')
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 101)
         for elt in interactions_count:
             color = next(colors)
             lines.append(mlines.Line2D([], [], color=color, label=interactions_count[elt][1]))
@@ -95,13 +107,13 @@ if __name__ =='__main__':
         ax2 = ax.twinx()
         ax2.tick_params(labelsize='large')
         ax2.semilogy(L_threshs, c_tot, color='black', linestyle='dotted')
-        ax2.set_ylim(1, 10000)
+        ax2.set_ylim(1, 100000)
         lines.append(mlines.Line2D([], [], color='black', label='Total', linestyle=':'))
         ax.grid(linestyle='--')
-        f.legend(handles=lines, loc='upper center', fontsize=8, bbox_to_anchor=(0.5, 1),
-            ncol=2, fancybox=True, shadow=True)
+        #f.legend(handles=lines, loc='upper center', fontsize=8, bbox_to_anchor=(0.5, 1),
+        #    ncol=2, fancybox=True, shadow=True)
         plt.tight_layout()
-        plt.savefig(jn(OUT_FOLDER, 'type_of_interactions_article2_'+str(cutoff)+'.png'))
+        plt.savefig(jn(OUT_FOLDER, 'type_of_interactions_'+str(cutoff)+'.png'))
         
         L_top_unknown = []
         for i, elt in enumerate(unknown_pairs):
@@ -127,7 +139,13 @@ if __name__ =='__main__':
             _L_top_unknown = []
             for j, tup in enumerate(sorted(unknown_pairs[i], key=unknown_pairs[i].get, reverse=True)[:n_top_unknown]):
                 _L_top_unknown.extend([tup, unknown_pairs[i][tup]])
-                net = nx.read_gpickle(jn(folder, str(cutoff)+'_'+str(i)+'.p'))
+                if cutoff != 2: #FLAG3
+                    net = nx.read_gpickle(jn(folder, str(cutoff)+'_'+str(i)+'.p'))
+                else:
+                    if i == 10 or i == 0:
+                        net = nx.read_gpickle(jn(folder, str(cutoff)+'_'+str(i//10)+'.p'))
+                    else:
+                        net = nx.read_gpickle(jn(folder, str(cutoff)+'_0-'+str(i)+'.p'))
                 avg = 0
                 for u, v in net.edges():
                     if (u[0], v[0]) == tup or (v[0], u[0]) == tup:
