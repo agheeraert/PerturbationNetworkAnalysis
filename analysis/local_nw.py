@@ -11,14 +11,18 @@ import pandas as pd
 from Bio.PDB.Polypeptide import aa3
 
 BASE_FOLDER = '/home/agheerae/results/avg_sims/nets/'
-APO_FOLDER = jn(BASE_FOLDER, 'apo')
-PRFAR_FOLDER = jn(BASE_FOLDER, 'prfar')
+apo_folder = jn(BASE_FOLDER, 'apo')
+prfar_folder = jn(BASE_FOLDER, 'prfar')
 OUT_FOLDER = '/home/agheerae/results/local_nw/noH/'
 q = len(aa3)
 aa_to_id = dict(zip(aa3, range(q)))
 
+
+def nw(net, node):
+    return net.degree(node)/net.degree(node, weight='weight')
+
 def delta_nw(net2, net1, node):
-    return net2.degree(node)/net2.degree(node, weight='weight')-net1.degree(node)/net1.degree(node, weight='weight')
+    return nw(net2, node)-nw(net1,node)
 
 if __name__ =='__main__':
     W, K, WK = np.zeros((7, 6)), np.zeros((7, 6)), np.zeros((7, 6))
@@ -30,14 +34,24 @@ if __name__ =='__main__':
             if (u,v) in apo_net and (u, v) in prfar_net:
                 new_weight=delta_nw(prfar_net, apo_net, u)+nw(prfar_net, apo_net, net, v)
             elif (u,v) in apo_net and (u,v) not in prfar_net:
-                new_weight = delta_nw(apo_net)
+                new_weight = nw(apo_net, u)+nw(apo_net,v)
             else:
-                new_weight = delta_nw(prfar_net)
+                new_weight = nw(prfar_net, u)+nw(prfar_net,v)
             if new_weight > 0:
                 new_net.add_edge(u, v, color='red', weight=abs(new_weight))
             elif new_weight < 0:
                 new_net.add_edge(u, v, color='blue', weight=abs(new_weight))
-        nx.write_gpickle(new_net, jn(OUT_FOLDER, str(cutoff)+'.p'))
-
-
-
+        nx.write_gpickle(new_net, jn(OUT_FOLDER, str(cutoff)+'_0.p'))
+        empty, thresh = False, 1
+        while not empty:
+            L_edge_remove = []
+            for u, v in new_net.edges():
+                if new_net.get_edge_data(u, v)['weight'] < thresh:
+                    L_edge_remove.append((u,v))
+            new_net.remove_edges_from(L_edge_remove)
+            new_net.remove_nodes_from(list(nx.isolates(new_net)))
+            if len(new_net.nodes()) == 0:
+                empty = True
+            else:
+                nx.write_gpickle(new_net, jn(OUT_FOLDER, str(cutoff)+'_'+str(thresh)+'.p'))
+            thresh += 1 
