@@ -66,15 +66,16 @@ class CreateLRN():
         return self.nw(self.net1), self.nw(self.net2)
 
 if __name__ == "__main__":
-    apo_folder = "/home/aghee/PDB/Apo_frames/Sim1"
-    prfar_folder= "/home/aghee/PDB/Prfar_frames/Sim1"
-    NW1, NW2 = [], []
-    for frame1, frame2 in tqdm(zip(sorted(listdir(apo_folder)), sorted(listdir(prfar_folder))), total=1000):
-        NWs = CreateLRN(jn(apo_folder, frame1), jn(prfar_folder, frame2)).get_nw()
-        NW1.append(NWs[0])
-        NW2.append(NWs[1])
-    pkl.dump(NW1, open("/home/aghee/results/long_range_evolution/NW_apo.p", 'wb'))
-    pkl.dump(NW2, open("/home/aghee/results/long_range_evolution/NW_prfar.p", 'wb'))
+    for i in range(2,5):
+        apo_folder = "/home/aghee/PDB/Apo_frames/Sim"+str(i)
+        prfar_folder= "/home/aghee/PDB/Prfar_frames/Sim"+str(i)
+        NW1, NW2 = [], []
+        for frame1, frame2 in tqdm(zip(sorted(listdir(apo_folder)), sorted(listdir(prfar_folder))), total=1000):
+            NWs = CreateLRN(jn(apo_folder, frame1), jn(prfar_folder, frame2)).get_nw()
+            NW1.append(NWs[0])
+            NW2.append(NWs[1])
+        pkl.dump(NW1, open("/home/aghee/results/long_range_evolution/NW_apo_"+str(i)+".p", 'wb'))
+        pkl.dump(NW2, open("/home/aghee/results/long_range_evolution/NW_prfar_"+str(i)+".p", 'wb'))
 
 
 
