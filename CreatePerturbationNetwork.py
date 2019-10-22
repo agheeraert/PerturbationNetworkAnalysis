@@ -1,4 +1,5 @@
 from CreateNetwork import CreateNetwork
+from DrawNetwork import DrawNetwork
 import networkx as nx
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
@@ -50,54 +51,8 @@ class CreatePerturbationNetwork(CreateNetwork):
         perturbation.remove_nodes_from(list(nx.isolates(perturbation)))
         return perturbation
 
-    def draw_perturbation(self, threshold, output, rearrange=None, neighbors=False, chains=False, save=None):
-        if isinstance(threshold, int) or isinstance(threshold, float):
-            threshold = [threshold]
-        for elt in threshold:
-            net = self.perturbation(elt)
-            colors = nx.get_edge_attributes(net, 'color').values()
-            weights = nx.get_edge_attributes(net, 'weight').values()
-            if rearrange:
-                c1, c2, positions = 0, 0, {}
-                for node in net.nodes():
-                    if node[-1] == rearrange[0]:
-                        positions[node] = [c1%2, (c1//2-(c1+1)%2)]
-                        c1+=1
-                    elif node[-1] == rearrange[1]:
-                        positions[node] = [c2%2+3, (c2//2-(c1+1)%2)]
-                        c2+=1
-                fig = plt.figure()
-            try:
-                nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, pos=positions, node_size=100, node_color='grey', font_size=8)
-            except (nx.NetworkXError, UnboundLocalError):
-                nx.draw(net, with_labels=True, font_weight='bold', edge_width=weights, edge_color=colors, node_size=100, node_color='grey', font_size=8)   
-            plt.savefig(join(output, str(self.cutoff)+'_'+str(elt)+'.pdf'))
-            output_folder = dirname(output)
-            if isinstance(save, str):
-                nx.write_gpickle(net, join(output_folder, str(self.cutoff)+'_'+str(elt)+'.p'))        
-            if neighbors:
-                if 'neighbors_'+str(elt) not in os.listdir(output_folder):    
-                    os.mkdir(join(output_folder, 'neighbors_'+str(elt)))
-                if chains:
-                    if '4D_'+str(elt) not in os.listdir(output_folder):    
-                        os.mkdir(join(output_folder, '4D_'+str(elt)))
-                for node in net.nodes():
-                    subG = nx.Graph()
-                    subG.add_nodes_from(net.neighbors(node))
-                    fourD = False
-                    for _node in net.neighbors(node):
-                        subG.add_edge(node, _node)
-                        if _node[-1] != node[-1]:
-                            fourD = True
-                    nx.set_edge_attributes(subG, name='color', values=nx.get_edge_attributes(net, 'color')) 
-                    nx.set_edge_attributes(subG, name='weight', values=nx.get_edge_attributes(net, 'weight')) 
-                    _colors = nx.get_edge_attributes(subG, 'color').values()
-                    _weights = nx.get_edge_attributes(subG, 'weight').values()
-                    fig = plt.figure()
-                    nx.draw(subG, with_labels=True, font_weight='bold', edge_color=_colors, width=[w / 5 for w in _weights])
-                    plt.savefig(join(output_folder, 'neighbors_'+str(elt), node+'.pdf'))
-                    if fourD and chains:
-                        plt.savefig(join(output_folder, '4D_'+str(elt), node+'.pdf'))
+    def draw_perturbation(self, output, pdb_path=None, method='default', colors=['red', 'dodgerblue']):
+        DrawNetwork(self.perturbation(0), output, pdb_path, method=method, colors=['red', 'dodgerblue'])
 
 
 if __name__ == '__main__':

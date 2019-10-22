@@ -82,7 +82,6 @@ for atom in structure.get_atoms():
     if atom.id == 'CA':
         residue = atom.parent
         c = 1*(residue.parent.id == 'H')
-        print(residue.id[1], residue.resname)
         if residue.resname in three2one:
                 y = (0.1822020302*atom.coord[0] + 0.6987674421*atom.coord[1] - 0.6917560857*atom.coord[2])*(1-0.5*c)
                 x = 0.9980297273*atom.coord[0]+ 0.0236149631*atom.coord[1]+ 0.05812914*atom.coord[2]

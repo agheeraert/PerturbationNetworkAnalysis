@@ -1,41 +1,43 @@
 from CreatePerturbationNetwork import CreatePerturbationNetwork
 import os 
-from os.path import join
+from os.path import join as jn
 import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser(description='Create the perturbation network between two proteins')
 parser.add_argument('path1',  type=str,
-                    help='First input file/folder')
+                    help='Input file/folder of the unperturbed state')
 parser.add_argument('path2',  type=str,
-                    help='Second input file/folder')
+                    help='Input file/folder of the perturbed state')
 parser.add_argument('output',  type=str,
-                    help='Output folder for the results')  
+                    help='Folder where to put the results')  
 parser.add_argument('-avg',  type=str,
-                    help='does the average of the input on folders')
-parser.add_argument('-range',  type=float, nargs=3,
-                    help='create the perturbation network for a range of thresholds')
-parser.add_argument('-threshold',  type=float,
-                    help='create the perturbation network for one threshold')  
-parser.add_argument('-cutoff', type=float, default=5,
-		    help='set the interaction cutoff (in Angstrom)')
-parser.add_argument('-rearrange',  type=str, nargs=2,
-                    help='display the full network so that two chains are separated')
-parser.add_argument('-save',  type=str, default=True,
-                    help='pickles the network')                      
+                    help='Does the average of the input on folders')
+parser.add_argument('-cutoffs', type=int, nargs='+',
+		    help='Set a list of interaction cutoffs (in Angstrom) (can be only one number)')    
+parser.add_argument('-drawing_method',  type=str,
+                    help='Method used to draw the graphs. Default = Networkx default. IGPS = IGPS splitting.')
+parser.add_argument('-pdb_path',  type=str,
+                    help='PDB structure file to help draw the network (works only with the IGPS drawing method as of now)')
+parser.add_argument('-drawing_colors',  type=list, nargs=2, default=['red', 'dodgerblue'],
+                    help='Color used to draw the edges')
 
 
 args = parser.parse_args()
-if args.range:
-    threshold = np.arange(args.range[0], args.range[1], args.range[2]).tolist()
-if args.threshold:
-    threshold = args.threshold
-if args.rearrange:
-    rearrange = tuple(args.rearrange)
     
 if args.avg:
     avg = True
 else:
     avg = False
 
-CreatePerturbationNetwork(path1=args.path1, path2=args.path2, avg=avg, cutoff=args.cutoff).draw_perturbation(threshold=threshold, output=args.output, rearrange=args.rearrange, save=args.save)
+if not args.cutoffs:
+    args.cutoff=[5]
+
+def mkdir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+for cutoff in args.cutoffs:
+    out_dir = jn(args.output, 'cutoff'+str(cutoff))
+    mkdir(out_dir)
+    CreatePerturbationNetwork(path1=args.path1, path2=args.path2, avg=avg, cutoff=cutoff).draw_perturbation(out_dir, pdb_path=args.pdb_path, method=args.drawing_method, colors=args.drawing_colors)
