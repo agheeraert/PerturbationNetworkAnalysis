@@ -11,7 +11,6 @@ from math import sqrt, copysign
 import warnings
 import argparse
 from copy import deepcopy
-from tests.type_of_interactions_plot import dict_residues, dict_interactions
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 three2one = dict(zip(aa3, aa1))
@@ -24,9 +23,7 @@ parser.add_argument('-pdb',  type=str, default='/home/agheerae/Article/base_IGPS
 parser.add_argument('-r',  type=bool, default=False,
                      help='Indicates there\'s a root in the filename')                    
 parser.add_argument('-t',  type=int , default=None,
-                     help='Splits the 2D graph representation to a certain threshold')
-parser.add_argument('-toi', type=str, default=None,
-                    help='Create networks based on type of interaction in the specified path (None for not doing it)')
+                     help='Splits the 2D graph representation until a specific certain threshold')
 args = parser.parse_args()
 
 def split_man(pos, L_nodes, L_direction_x, L_direction_y):
@@ -78,31 +75,6 @@ def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-def create_toi(net, pos, thresh):
-    for interaction in dict_interactions:
-        fig = plt.figure(figsize=[6.4, 4.8], dpi=200)
-        workdir = jn(args.toi, dict_interactions[interaction])
-        mkdir(workdir)
-        to_remove_edges = []
-        _net = deepcopy(net)
-        for u, v in _net.edges():
-            toi = (dict_residues[u[0]], dict_residues[v[0]])
-            if toi != interaction and toi[::-1] != interaction:
-                to_remove_edges.append((u, v))
-        _net.remove_edges_from(to_remove_edges)
-        _net.remove_nodes_from(list(nx.isolates(_net))) 
-        if len(_net.nodes()) != 0:
-            _colors = list(nx.get_edge_attributes(_net, 'color').values())
-            for i, color in enumerate(_colors):
-                if color == 'g':
-                    _colors[i] = 'dodgerblue'                
-            _width = list(nx.get_edge_attributes(_net, 'weight').values())
-            max_width = max(_width)
-            for i, elt in enumerate(_width):
-                _width[i] = elt/max_width*5     
-            nx.draw(_net, font_weight='bold', labels={node: node[:-2] for node in _net.nodes()}, width=_width, pos=pos, edge_color=_colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
-            plt.savefig(jn(workdir, thresh+'.pdf'))
-
 structure = PDBParser().get_structure('X', args.pdb)[0]
 pos = {}
 distance_thresh = 1
@@ -110,6 +82,7 @@ for atom in structure.get_atoms():
     if atom.id == 'CA':
         residue = atom.parent
         c = 1*(residue.parent.id == 'H')
+        print(residue.id[1], residue.resname)
         if residue.resname in three2one:
                 y = (0.1822020302*atom.coord[0] + 0.6987674421*atom.coord[1] - 0.6917560857*atom.coord[2])*(1-0.5*c)
                 x = 0.9980297273*atom.coord[0]+ 0.0236149631*atom.coord[1]+ 0.05812914*atom.coord[2]
@@ -157,8 +130,6 @@ while not empty:
             output = output_str1+'_'+thresh+'_'+root
         nx.write_gpickle(net, output+'.p')
         plt.savefig(output+'.pdf')
-        if args.toi:
-            create_toi(net, pos, thresh)
         threshold+=1
     else:
         empty = True

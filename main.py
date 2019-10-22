@@ -4,7 +4,7 @@ from os.path import join
 import argparse
 import numpy as np
 
-parser = argparse.ArgumentParser(description='Create the perturbation network of two proteins')
+parser = argparse.ArgumentParser(description='Create the perturbation network between two proteins')
 parser.add_argument('path1',  type=str,
                     help='First input file/folder')
 parser.add_argument('path2',  type=str,

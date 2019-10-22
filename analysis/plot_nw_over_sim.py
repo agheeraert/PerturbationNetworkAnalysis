@@ -13,33 +13,33 @@ from math import sqrt, ceil
 
 NW1 = pkl.load(open("/home/aghee/results/long_range_evolution/NW_apo.p", "rb"))
 NW2 = pkl.load(open("/home/aghee/results/long_range_evolution/NW_prfar.p", "rb"))
-# L_aa = set([aa for elt in NW1 for aa in elt])
-# for node in L_aa:
-#     if node[-1] == "H":
-#         node_str = node[0]+str(int(node[1:-2])-253)+node[-1]
-#     else:
-#         node_str = node
-#     f = plt.figure()
-#     NW1_node, NW2_node = [], []
-#     for i in range(len(NW1)):
-#         if node in NW1[i]:
-#             NW1_node.append(NW1[i][node])
-#         else:
-#             NW1_node.append(0)
-#         if node in NW2[i]:
-#             NW2_node.append(NW2[i][node])
-#         else:
-#             NW2_node.append(0)
-#     plt.plot(list(range(len(NW1))), NW1_node, color = 'b')
-#     plt.plot(list(range(len(NW2))), NW2_node, color = 'r')
-#     lines = []
-#     lines.append(mlines.Line2D([], [], color='b', label='APO'))
-#     lines.append(mlines.Line2D([], [], color='r', label='PRFAR'))
-#     f.legend(handles=lines, fontsize=8, bbox_to_anchor=(0.985, 1), ncol=2, fancybox=True, shadow=True)
-#     plt.title(r"$\bf{" + node_str + "}$")
-#     plt.tight_layout()
-#     plt.savefig('/home/aghee/results/long_range_evolution/'+node_str+'.png')
-#     plt.close()
+L_aa = set([aa for elt in NW1 for aa in elt])
+for node in L_aa:
+    if node[-1] == "H":
+        node_str = node[0]+str(int(node[1:-2])-253)+node[-1]
+    else:
+        node_str = node
+    f = plt.figure()
+    NW1_node, NW2_node = [], []
+    for i in range(len(NW1)):
+        if node in NW1[i]:
+            NW1_node.append(NW1[i][node])
+        else:
+            NW1_node.append(0)
+        if node in NW2[i]:
+            NW2_node.append(NW2[i][node])
+        else:
+            NW2_node.append(0)
+    plt.plot(list(range(len(NW1))), NW1_node, color = 'b')
+    plt.plot(list(range(len(NW2))), NW2_node, color = 'r')
+    lines = []
+    lines.append(mlines.Line2D([], [], color='b', label='APO'))
+    lines.append(mlines.Line2D([], [], color='r', label='PRFAR'))
+    f.legend(handles=lines, fontsize=8, bbox_to_anchor=(0.985, 1), ncol=2, fancybox=True, shadow=True)
+    plt.title(r"$\bf{" + node_str + "}$")
+    plt.tight_layout()
+    plt.savefig('/home/aghee/results/long_range_evolution/'+node_str+'.png')
+    plt.close()
 
 L_bottom = ["G202:F", "T142:F", "R133:F", "A224:F", "F227:F", "S225:F", "K19:F", "D11:F", "L50:F", "G20:F", "H228:F"]
 L_sb = ["E67:F", "E71:F", "R18:H", "E91:F", "R95:F", "Y136:H", "V248:F", "R249:F", "L250:F", "R22:H", "Q72:F", "R187:H", "D74:F", "N247:F", "W123:H", "I73:F", "I75:F", "K184:H", "M14:H"]
