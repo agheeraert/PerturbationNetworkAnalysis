@@ -16,6 +16,9 @@ class CreateNetwork:
         self.pos2 = pos2
         self.three2one = dict(zip(aa3, aa1))
         self.one2three = dict(zip(aa1, aa3))
+        # Some residues have different name in MD simulations (because of the protonation or other issues)
+        # this can lead to non recognition of some residues. Add a line here if needed.
+        # (See Troubleshooting 4.1 from tutorial for more information)
         self.three2one['5CS'] = 'C'
         self.three2one['HIP'] = 'H'
         self.three2one['HID'] = 'H'
@@ -25,6 +28,7 @@ class CreateNetwork:
         self.cutoff = cutoff
 
     def create(self, pdb):
+        """ Creates the amino acid network using biographs"""
         mol = bg.Pmolecule(pdb)
         self.net = mol.network(cutoff=self.cutoff, weight=True)
         self.structure = PDBParser().get_structure('X', pdb)[0]
@@ -34,7 +38,7 @@ class CreateNetwork:
                 if pos not in range(self.pos1, self.pos2):
                     self.net.remove_node(node)
 
-        residues, bad_nodes = [], []
+        residues = []
         for residue in self.structure.get_residues():
             residues.append(self.three2one[residue.resname])
         old_labels = self.net.nodes
@@ -44,10 +48,13 @@ class CreateNetwork:
         return self.net
 
     def save(self, pdb, output):
+        """Directtly saves the network"""
         net = self.create(pdb)
         nx.write_gpickle(net, output)
 
     def create_average(self, folder):
+        """Creates the average network over a folder. The average is computed at each step for memory issues.
+        This has been demonstrated to be equivalent to a global average."""
         net = None
         weights = dict()
         for filepath in tqdm(listdir(folder)):
@@ -70,19 +77,18 @@ class CreateNetwork:
         return net
 
     def save_avg(self, folder, output):
+        """Saves the average"""
         net = self.create_average(folder)
         nx.write_gpickle(net, output) 
 
     def draw_avg(self, folder, output):
+        """Draws and saves the average"""
         net = self.create_average(folder)
         f = plt.figure()
         nx.draw(net, with_labels=True, font_weight='bold')
         nx.write_gpickle(net, output)    
 
     def draw(self, pdb, output):
+        """Draws the network"""
         net = self.create(pdb)
         nx.draw(net, with_labels=True, font_weight='bold')
-
-if __name__ == '__main__':
-    sim_folders = ['sim'+str(i) for i in range(2, 5)]
-    CreateNetwork().save('/home/agheerae/PDB/1GPW_cd_nochain.pdb', '/home/agheerae/results/teee.p')

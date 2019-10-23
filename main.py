@@ -1,3 +1,9 @@
+"""Adapted from Lorenza Pacini's code 
+https://github.com/lorpac
+
+Main file to compute perturbation network
+"""
+
 from CreatePerturbationNetwork import CreatePerturbationNetwork
 import os 
 from os.path import join as jn
@@ -13,7 +19,7 @@ parser.add_argument('output',  type=str,
                     help='Folder where to put the results')  
 parser.add_argument('-avg',  type=str,
                     help='Does the average of the input on folders')
-parser.add_argument('-cutoffs', type=int, nargs='+',
+parser.add_argument('-cutoffs', type=int, nargs='+', default=[5],
 		    help='Set a list of interaction cutoffs (in Angstrom) (can be only one number)')    
 parser.add_argument('-drawing_method',  type=str,
                     help='Method used to draw the graphs. Default = Networkx default. IGPS = IGPS splitting.')
@@ -29,9 +35,6 @@ if args.avg:
     avg = True
 else:
     avg = False
-
-if not args.cutoffs:
-    args.cutoff=[5]
 
 def mkdir(directory):
     if not os.path.exists(directory):

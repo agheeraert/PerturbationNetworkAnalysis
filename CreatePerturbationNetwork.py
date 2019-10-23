@@ -10,6 +10,7 @@ from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreatePerturbationNetwork(CreateNetwork):
+    """Creates the Perturbation Network"""
     def __init__(self, path1, path2, pos1=None, pos2=None, cutoff=5, avg=False):
         super().__init__(pos1=pos1, pos2=pos2, cutoff=cutoff)
         if not avg:
@@ -20,6 +21,7 @@ class CreatePerturbationNetwork(CreateNetwork):
             self.net2 = self.create_average(path2)            
 
     def perturbation(self, threshold):
+        """Crates the perturbation network between the initialized networks at a specific threshold"""
         perturbation = nx.compose(self.net1, self.net2)
         mapping_weight, mapping_color = {}, {}
         for u, v in set(self.net2.edges) & set(self.net1.edges):
@@ -52,8 +54,6 @@ class CreatePerturbationNetwork(CreateNetwork):
         return perturbation
 
     def draw_perturbation(self, output, pdb_path=None, method='default', colors=['red', 'dodgerblue']):
+        """Draws and save the perturbation network for the initialized networks for all integer 
+        thresholds until the network is empty"""
         DrawNetwork(self.perturbation(0), output, pdb_path, method=method, colors=['red', 'dodgerblue'])
-
-
-if __name__ == '__main__':
-    CreatePerturbationNetwork(path1='/home/agheerae/Python/PerturbationNetworkAnalysis/data/apo_all/', path2='/home/agheerae/Python/PerturbationNetworkAnalysis/data/prfar_all/', avg=True).draw_perturbation(threshold=range(1, 30, 1), output='/home/agheerae/Python/PerturbationNetworkAnalysis/data/', rearrange=('H', 'F'), save='avg')
