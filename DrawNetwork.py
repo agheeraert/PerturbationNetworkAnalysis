@@ -18,13 +18,12 @@ three2one = dict(zip(aa3, aa1))
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
     def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue']):
-        methods = ['default', 'IGPS']
         self.net = network
         self.colors = colors
         self.pdb_path = pdb_path
         self.output = output
         if method == 'default':
-            self.draw_default()
+            self.draw_default(pos=None)
         if method == 'IGPS':
             self.draw_IGPS()
     
@@ -48,6 +47,7 @@ class DrawNetwork():
         """Default method to draw the networks. A dictionnary (pos) can be given to draw specific nodes in specific positions"""
         threshold = 0
         empty = False
+        print('wesh')
         while not empty:
             to_remove_edges = []
             for u, v in self.net.edges():
@@ -79,7 +79,6 @@ class DrawNetwork():
                     nx.draw(self.net, font_weight='bold', nodelist=[node for node in self.net.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in self.net.nodes()}, width=width, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
                     nx.draw(self.net, font_weight='bold', nodelist=[node for node in self.net.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in self.net.nodes()}, width=width, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')                        
                 output_path = jn(self.output, str(threshold)) 
-                print(output_path)
                 nx.write_gpickle(self.net, output_path+'.p')
                 plt.savefig(output_path+'.pdf')
                 threshold+=1

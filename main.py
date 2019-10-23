@@ -21,7 +21,7 @@ parser.add_argument('-avg',  type=str,
                     help='Does the average of the input on folders')
 parser.add_argument('-cutoffs', type=int, nargs='+', default=[5],
 		    help='Set a list of interaction cutoffs (in Angstrom) (can be only one number)')    
-parser.add_argument('-drawing_method',  type=str,
+parser.add_argument('-drawing_method',  type=str, default='default',
                     help='Method used to draw the graphs. Default = Networkx default. IGPS = IGPS splitting.')
 parser.add_argument('-pdb_path',  type=str,
                     help='PDB structure file to help draw the network (works only with the IGPS drawing method as of now)')
