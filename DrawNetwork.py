@@ -47,7 +47,6 @@ class DrawNetwork():
         """Default method to draw the networks. A dictionnary (pos) can be given to draw specific nodes in specific positions"""
         threshold = 0
         empty = False
-        print('wesh')
         while not empty:
             to_remove_edges = []
             for u, v in self.net.edges():
@@ -58,7 +57,6 @@ class DrawNetwork():
             self.net.remove_nodes_from(list(nx.isolates(self.net)))
 
             if len(self.net.edges()) != 0:
-                print('ca trace')
                 fig = plt.figure()
                 colors = list(nx.get_edge_attributes(self.net, 'color').values())
                 for i, color in enumerate(colors):
