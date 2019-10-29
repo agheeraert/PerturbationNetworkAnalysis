@@ -11,9 +11,9 @@ from math import sqrt, copysign
 import warnings
 import argparse
 from copy import deepcopy
+from CreateNetwork import three2one
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
-three2one = dict(zip(aa3, aa1))
 
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
@@ -28,7 +28,7 @@ class DrawNetwork():
             self.draw_IGPS()
         if method == '4CFF':
             self.draw_4CFF()
-            
+
     def draw_4CFF(self):
         """A specific drawing adapted for 4CFF"""
         structure = PDBParser().get_structure('X', self.pdb_path)[0]
@@ -37,14 +37,14 @@ class DrawNetwork():
             if atom.id == 'CA':
                 residue = atom.parent
                 if residue.resname in three2one:
-                    db = sqrt((atom.coord[0]-73.611)**2+atom.coord[1]-82.015)**2+atom.coord[3]-63.604)**2)
-                    dc = sqrt((atom.coord[0]-35.412)**2+atom.coord[1]-25.575)**2+atom.coord[3]-49.462)**2)
-                    x = sqrt(dc**2-((dc**2-db**2)/(2*69.60)+60.60/2)**2)
-                    db = sqrt((atom.coord[0]-53.566)**2+atom.coord[1]-49.963)**2+atom.coord[3]-69.036)**2)
-                    dc = sqrt((atom.coord[0]-58)**2+atom.coord[1]-52.115)**2+atom.coord[3]-49.13)**2)
-                    y = sqrt(dc**2-((dc**2-db**2)/(2*20.50)+20.50/2)**2
+                    db = sqrt((atom.coord[0]-73.611)**2+(atom.coord[1]-82.015)**2+(atom.coord[2]-63.604)**2)
+                    dc = sqrt((atom.coord[0]-35.412)**2+(atom.coord[1]-25.575)**2+(atom.coord[2]-49.462)**2)
+                    x = sqrt(abs(dc**2-((dc**2-db**2)/(2*69.60)+60.60/2)**2))
+                    db = sqrt((atom.coord[0]-53.566)**2+(atom.coord[1]-49.963)**2+(atom.coord[2]-69.036)**2)
+                    dc = sqrt((atom.coord[0]-58)**2+(atom.coord[1]-52.115)**2+(atom.coord[2]-49.13)**2)
+                    y = sqrt(abs(dc**2-((dc**2-db**2)/(2*20.50)+20.50/2)**2))
                     pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = (x, y)
-         self.draw_default(pos)
+        self.draw_default(pos)
        
 
     def draw_IGPS(self):
@@ -91,8 +91,7 @@ class DrawNetwork():
                 weights = {(u, v): round(nx.get_edge_attributes(self.net, 'weight')[(u,v)]) for (u, v) in nx.get_edge_attributes(self.net, 'weight')}
                 if pos:
                     pos = {node: pos[node] for node in self.net.nodes()}
-                    nx.draw(self.net, font_weight='bold', nodelist=[node for node in self.net.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in self.net.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
-                    nx.draw(self.net, font_weight='bold', nodelist=[node for node in self.net.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in self.net.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
+                    nx.draw(self.net, font_weight='bold', labels={node: node[:-2] for node in self.net.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
                 else:
                     nx.draw(self.net, font_weight='bold', nodelist=[node for node in self.net.nodes() if node[-1]=='F'], labels={node: node[:-2] for node in self.net.nodes()}, width=width, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
                     nx.draw(self.net, font_weight='bold', nodelist=[node for node in self.net.nodes() if node[-1]=='H'], labels={node: node[:-2] for node in self.net.nodes()}, width=width, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')                        

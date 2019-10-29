@@ -24,7 +24,18 @@ parser.add_argument('-norm', type=float, default=1.5,
 args = parser.parse_args()
 
 three2one = dict(zip(aa3, aa1))
+one2three = dict(zip(aa1, aa3))
+# Some residues have different name in MD simulations (because of the protonation or other issues)
+# this can lead to non recognition of some residues. Add a line here if needed.
+# (See Troubleshooting 4.1 from tutorial for more information)
 three2one['5CS'] = 'C'
+three2one['HIP'] = 'H'
+three2one['HID'] = 'H'
+three2one['HIE'] = 'H'
+three2one['GLH'] = 'E'
+three2one['ASH'] = 'D'
+three2one['S2P'] = 'S'
+
 A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
 color = not args.nc

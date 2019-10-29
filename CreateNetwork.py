@@ -10,21 +10,25 @@ import warnings
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 
+three2one = dict(zip(aa3, aa1))
+one2three = dict(zip(aa1, aa3))
+# Some residues have different name in MD simulations (because of the protonation or other issues)
+# this can lead to non recognition of some residues. Add a line here if needed.
+# (See Troubleshooting 4.1 from tutorial for more information)
+three2one['5CS'] = 'C'
+three2one['HIP'] = 'H'
+three2one['HID'] = 'H'
+three2one['HIE'] = 'H'
+three2one['GLH'] = 'E'
+three2one['ASH'] = 'D'
+three2one['S2P'] = 'S'
+
 class CreateNetwork:
     def __init__(self, pos1=None, pos2=None, cutoff=5):
         self.pos1 = pos1
         self.pos2 = pos2
-        self.three2one = dict(zip(aa3, aa1))
-        self.one2three = dict(zip(aa1, aa3))
-        # Some residues have different name in MD simulations (because of the protonation or other issues)
-        # this can lead to non recognition of some residues. Add a line here if needed.
-        # (See Troubleshooting 4.1 from tutorial for more information)
-        self.three2one['5CS'] = 'C'
-        self.three2one['HIP'] = 'H'
-        self.three2one['HID'] = 'H'
-        self.three2one['HIE'] = 'H'
-        self.three2one['GLH'] = 'E'
-        self.three2one['ASH'] = 'D'
+        self.three2one = three2one
+        self.one2three = one2three 
         self.cutoff = cutoff
 
     def create(self, pdb):
