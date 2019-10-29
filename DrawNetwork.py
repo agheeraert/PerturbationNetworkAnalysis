@@ -26,7 +26,27 @@ class DrawNetwork():
             self.draw_default(pos=None)
         if method == 'IGPS':
             self.draw_IGPS()
-    
+        if method == '4CFF':
+            self.draw_4CFF()
+            
+    def draw_4CFF(self):
+        """A specific drawing adapted for 4CFF"""
+        structure = PDBParser().get_structure('X', self.pdb_path)[0]
+        pos = {}
+        for atom in structure.get_atoms():
+            if atom.id == 'CA':
+                residue = atom.parent
+                if residue.resname in three2one:
+                    db = sqrt((atom.coord[0]-73.611)**2+atom.coord[1]-82.015)**2+atom.coord[3]-63.604)**2)
+                    dc = sqrt((atom.coord[0]-35.412)**2+atom.coord[1]-25.575)**2+atom.coord[3]-49.462)**2)
+                    x = sqrt(dc**2-((dc**2-db**2)/(2*69.60)+60.60/2)**2)
+                    db = sqrt((atom.coord[0]-53.566)**2+atom.coord[1]-49.963)**2+atom.coord[3]-69.036)**2)
+                    dc = sqrt((atom.coord[0]-58)**2+atom.coord[1]-52.115)**2+atom.coord[3]-49.13)**2)
+                    y = sqrt(dc**2-((dc**2-db**2)/(2*20.50)+20.50/2)**2
+                    pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = (x, y)
+         self.draw_default(pos)
+       
+
     def draw_IGPS(self):
         """A specific drawing adapted to IGPS this should be tunable for other proteins"""
         structure = PDBParser().get_structure('X', self.pdb_path)[0]
