@@ -18,6 +18,7 @@ warnings.simplefilter('ignore', PDBConstructionWarning)
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
     def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue']):
+        print('Drawing...')
         self.net = network
         self.colors = colors
         self.pdb_path = pdb_path
