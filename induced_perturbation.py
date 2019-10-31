@@ -13,7 +13,7 @@ from CreatePerturbationNetwork import CreatePerturbationNetwork
 
 parser = argparse.ArgumentParser(description='Create induced perturbation network from perturbation network.')
 parser.add_argument('-f',  type=str, nargs='+',
-                    help='Input pickled network (you should use 0.p it will create automatically all the other thresholds') ')
+                    help='List of network to redraw with the zoomed induced perturbation network')
 parser.add_argument('-r', type=str, nargs='+',
                     help='Root nodes used for the induced perturbation network')
 parser.add_argument('-drawing_method',  type=str, default='default',
@@ -30,12 +30,12 @@ def mkdir(directory):
         os.makedirs(directory)
 
 for _file in args.f:
-    net = nx.read_gpickle(args.f)
+    net = nx.read_gpickle(_file)
     _weights = nx.get_edge_attributes(net, 'weight')
     _colors = nx.get_edge_attributes(net, 'color')
     for root in args.r:
         if root in net.nodes():
-            out_folder = jn(args.f, args.r)
+            out_folder = jn(dirname(_file), root)
             mkdir(out_folder)
             tree = nx.Graph(nx.bfs_tree(net, root))
             for u, v in net.edges():
@@ -43,4 +43,4 @@ for _file in args.f:
                     tree.add_edge(u, v)
             nx.set_edge_attributes(tree, name='weight', values=_weights)
             nx.set_edge_attributes(tree, name='color', values=_colors)
-            DrawNetwork(tree, out_folder, pdb_path=args.pdb_path, method=args.drawing_method, colors=args.drawing_colors)
+            DrawNetwork(tree, jn(out_folder, basename(_file).split('.')[0]), pdb_path=args.pdb_path, method=args.drawing_method, colors=args.drawing_colors, single=True)
