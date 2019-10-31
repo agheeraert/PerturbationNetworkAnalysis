@@ -7,39 +7,27 @@ from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
 import argparse
 
+from CreateNetwork import three2one
+
 parser = argparse.ArgumentParser(description='file paths')
 parser.add_argument('pdb_path',  type=str,
                     help='pdb file')
-parser.add_argument('net_path',  type=str,
-                    help='network file')
-parser.add_argument('output',  type=str,
-                    help='output file')                   
+parser.add_argument('f',  type=str, nargs='+',
+                    help='network file. Can be a list but they should all relate to the same pdb structure.')
 parser.add_argument('-nc',  type=bool, default=False,
-                    help='the network has no edge color attribute')      
+                    help='to specify that the network has no edge color attribute')      
 parser.add_argument('-ntodraw', type=str, nargs='+', default=None,
-                    help="draw only a list of nodes")              
+                    help="draw only the specified list of nodes")              
 parser.add_argument('-norm', type=float, default=1.5,
-                    help="changes the normalizaton factor")              
+                    help="changes the normalizaton factor for the edges width.")
+parser.add_argument('-c', type=str, nargs=3, default=['red', 'blue', 'silver'],
+                    help="changes the colors used to draw the network. In the order: edges that increases in contact number, edges that decreases in contact number, node")              
 
 args = parser.parse_args()
 
-three2one = dict(zip(aa3, aa1))
-one2three = dict(zip(aa1, aa3))
-# Some residues have different name in MD simulations (because of the protonation or other issues)
-# this can lead to non recognition of some residues. Add a line here if needed.
-# (See Troubleshooting 4.1 from tutorial for more information)
-three2one['5CS'] = 'C'
-three2one['HIP'] = 'H'
-three2one['HID'] = 'H'
-three2one['HIE'] = 'H'
-three2one['GLH'] = 'E'
-three2one['ASH'] = 'D'
-three2one['S2P'] = 'S'
 
-A = nx.read_gpickle(args.net_path)
 structure = PDBParser().get_structure('X', args.pdb_path)[0]
 color = not args.nc
-div = max(nx.get_edge_attributes(A, 'weight').values())/args.norm
 
 node2CA = {}
 for atom in structure.get_atoms():
@@ -49,16 +37,20 @@ for atom in structure.get_atoms():
                 coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
                 node2CA[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = coords
 
-with open(args.output, 'w') as output:
+for fichier in args.f:
+    out_path = fichier[:-2]+'.tcl'
+    with open(out_path, 'w') as output:
         output.write('draw delete all \n')
         previous = None
+        A = nx.read_gpickle(fichier)
+        div = max(nx.get_edge_attributes(A, 'weight').values())/args.norm
         for u, v in A.edges():
             if color:
                 c = A.get_edge_data(u, v)['color']
                 if c == 'g':
-                    c = 'blue'
+                    c = args.c[1]
                 if c == 'r':
-                    c = 'red' 
+                    c = args.c[0] 
                 if previous != c:
                     output.write('draw color ' +c+'\n')
                     previous = c  
@@ -68,19 +60,18 @@ with open(args.output, 'w') as output:
                 else:
                     output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
             else:
-                output.write('draw color silver \n')
+                output.write('draw color '+args.c[2]+'\n')
                 if args.ntodraw:
                     if u in args.ntodraw and v in args.ntodraw:
                         output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
                 else:
                     output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
-
-        output.write('draw color 2 \n')
-     
+        output.write('draw color silver \n')
         for u in A.nodes():
             if args.ntodraw:
                 if u in args.ntodraw:
                     output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
             else:
                 output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
+
 
