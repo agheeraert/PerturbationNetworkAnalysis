@@ -11,11 +11,14 @@ warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class CreatePerturbationNetwork(CreateNetwork):
     """Creates the Perturbation Network"""
-    def __init__(self, path1, path2, pos1=None, pos2=None, cutoff=5, avg=False):
+    def __init__(self, path1, path2, pos1=None, pos2=None, cutoff=5, avg=False, std=False):
         super().__init__(pos1=pos1, pos2=pos2, cutoff=cutoff)
-        if not avg:
+        if not avg and not std:
             self.net1 = self.create(path1)
             self.net2 = self.create(path2)
+        elif std:
+            self.net1 = self.create_avg_std(path1)
+            self.net2 = self.create_avg_std(path2)
         else:
             self.net1 = self.create_average(path1)
             self.net2 = self.create_average(path2)            

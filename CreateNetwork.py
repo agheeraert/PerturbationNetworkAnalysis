@@ -3,6 +3,7 @@ from Bio.PDB.Polypeptide import aa1, aa3
 from Bio.PDB import PDBParser
 import networkx as nx
 import matplotlib.pyplot as plt
+from math import sqrt
 from tqdm import tqdm
 from os import listdir
 from os.path import join
@@ -77,6 +78,31 @@ class CreateNetwork:
         new_weights = {}
         for elt in weights:
             new_weights[elt]=weights[elt]/len(listdir(folder))
+        nx.set_edge_attributes(net, name='weight', values=new_weights)
+        return net
+
+    def create_avg_std(self, folder):
+        """Creates the average network modulated by the standard deviation over a folder."""
+        net = None
+        avg, std, previous_avg = {}, {}, {}
+        for i, filepath in enumerate(tqdm(listdir(folder))):
+            if net:
+                _net = self.create(join(folder, filepath))
+                for u, v in _net.edges():
+                    if (u, v) in avg:
+                        previous_avg[(u,v)] = avg[(u, v)]
+                        avg[(u,v)] = 1/(i+1)*(_net.get_edge_data(u, v)['weight']+i*avg[(u,v)])
+                        std[(u,v)] = sqrt(1/i*((i-1)*std[(u,v)]+i*(previous_avg[(u,v)]-avg[(u,v)])**2+(_net.get_edge_data(u, v)['weight']-avg[(u,v)])**2))
+                    else:
+                        avg[(u,v)] = 1/(i+1)*(_net.get_edge_data(u, v)['weight'])
+                        std[(u,v)] = 0
+                net = nx.compose(net, _net)
+            else:
+                net = self.create(join(folder, filepath))
+                for u, v in net.edges():
+                    avg[(u, v)] = net.get_edge_data(u, v)['weight']
+                    std[(u, v)] = 0
+        new_weights = {elt: avg[elt]*std[elt] for elt in avg}
         nx.set_edge_attributes(net, name='weight', values=new_weights)
         return net
 
