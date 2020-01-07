@@ -19,7 +19,7 @@ aa_to_id = dict(zip(aa3, range(q)))
 
 
 def nw(net, node):
-    return net.degree(node)/net.degree(node, weight='weight')
+    return net.degree(node, weight='weight')/net.degree(node)
 
 def dictup(dic, node, value):
     if node in dic:
@@ -28,11 +28,13 @@ def dictup(dic, node, value):
         dic[node] = [value]
 
 def plotdic(dico, string):
-    plt.figure()
+    plt.figure(figsize=(10,72))
     for i, elt in enumerate(dico):
-        plt.subplot(46,10, i+1)
+        plt.subplot(57,8, i+1)
         plt.plot(cutoffs, dico[elt])
         plt.title(elt)
+        plt.xticks(np.arange(3,10), np.arange(3,10), fontsize=8)
+    plt.tight_layout()
     plt.savefig(jn(OUT_FOLDER, string))
     plt.close()
 
