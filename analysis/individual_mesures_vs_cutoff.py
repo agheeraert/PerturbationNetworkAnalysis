@@ -13,7 +13,7 @@ from Bio.PDB.Polypeptide import aa3
 BASE_FOLDER = '/home/agheerae/results/avg_sims/nets/'
 apo_folder = jn(BASE_FOLDER, 'apo')
 prfar_folder = jn(BASE_FOLDER, 'prfar')
-OUT_FOLDER = '/home/agheerae/results/local_nw/noH/'
+OUT_FOLDER = '/home/agheerae/results/individual_mesures_vs_cutoff'
 q = len(aa3)
 aa_to_id = dict(zip(aa3, range(q)))
 
