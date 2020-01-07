@@ -27,6 +27,20 @@ def dictup(dic, node, value):
     else:
         dic[node] = [value]
 
+def plotdic(dico, string):
+    plt.figure()
+    for i, elt in enumerate(dico):
+        plt.subplot(46,10, i+1)
+        plt.plot(cutoffs, dico[elt])
+        plt.title(elt)
+    plt.savefig(jn(OUT_FOLDER, string))
+    plt.close()
+
+def deltadic(dic1, dic2):
+    dic = {}
+    for elt in dic2:
+        dic[elt] = (np.asarray(dic2[elt])-np.asarray(dic1[elt])).tolist()
+    return dic
 
 if __name__ =='__main__':
     degree_apo = {}
@@ -35,7 +49,8 @@ if __name__ =='__main__':
     weight_prfar = {}
     nw_apo = {}
     nw_prfar = {}
-    for cutoff in range(3, 10):
+    cutoffs = range(3, 10)
+    for cutoff in cutoffs:
             apo_net = nx.read_gpickle(jn(apo_folder, str(cutoff)+'.p'))
             prfar_net = nx.read_gpickle(jn(prfar_folder, str(cutoff)+'.p'))
             for node in apo_net.nodes():
@@ -46,16 +61,20 @@ if __name__ =='__main__':
                 dictup(degree_prfar, node, prfar_net.degree(node))
                 dictup(weight_prfar, node, prfar_net.degree(node, weight='weight'))
                 dictup(nw_prfar, node, nw(prfar_net, node))
+    degree_delta = deltadic(degree_apo, degree_prfar)
+    weight_delta = deltadic(weight_apo, weight_prfar)
+    nw_delta = deltadic(nw_apo, nw_prfar)
 
-    dico = degree_apo
-    cutoffs = range(3, 10)
 
-    plt.figure()
-    for i, elt in enumerate(dico):
-        plt.subplot(46,10, i)
-        plt.plot(cutoffs, dico[elt])
-        plt.title(elt)
-    plt.savefig(jn(OUT_FOLDER, 'degree.png'))
+    plotdic(degree_apo, 'degree_apo.png')
+    plotdic(degree_prfar, 'degree_prfar.png')
+    plotdic(degree_delta, 'degree_delta.png')
+    plotdic(weight_apo, 'weight_apo.png')
+    plotdic(weight_prfar, 'weight_prfar.png')
+    plotdic(weight_delta, 'weight_delta.png')    
+    plotdic(nw_apo, 'nw_apo.png')
+    plotdic(nw_prfar, 'nw_prfar.png')
+    plotdic(nw_delta, 'nw_delta.png')
         
 
 
