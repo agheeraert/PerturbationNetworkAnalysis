@@ -48,6 +48,15 @@ if __name__ =='__main__':
                 dictup(nw_prfar, node, nw(prfar_net, node))
 
     dico = degree_apo
-    print(len(dico))
+    cutoffs = range(3, 10)
+
+    plt.figure()
+    for i, elt in enumerate(dico):
+        plt.subplot(46,10, i)
+        plt.plot(cutoffs, dico[elt])
+        plt.title(elt)
+    plt.savefig(jn(OUT_FOLDER, 'degree.png'))
+        
+
 
 
