@@ -1,7 +1,6 @@
 """Adapted from Lorenza Pacini's code 
 https://github.com/lorpac
 
-Main file to compute perturbation network
 """
 
 from CreateNetwork import CreateNetwork
