@@ -17,13 +17,14 @@ warnings.simplefilter('ignore', PDBConstructionWarning)
 
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
-    def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue'], single=False):
+    def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue'], single=False, increment=1):
         print('Drawing...')
         self.net = network
         self.colors = colors
         self.pdb_path = pdb_path
         self.output = output
         self.single = single
+        self.increment = increment
         if method == 'IGPS':
             self.draw_IGPS()
         elif method == '4CFF':
@@ -88,7 +89,7 @@ class DrawNetwork():
             if len(self.net.edges()) != 0:
                 output_path = jn(self.output, str(threshold))
                 self.drawing(output_path, pos)    
-                threshold += 1
+                threshold += self.increment 
             else:
                 empty = True
             

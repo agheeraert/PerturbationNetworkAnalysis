@@ -15,10 +15,11 @@ parser.add_argument('-pdb_path',  type=str,
                     help='PDB structure file to help draw the network (works only with the IGPS drawing method as of now)')
 parser.add_argument('-drawing_colors',  type=str, nargs=2, default=['red', 'dodgerblue'],
                     help='Color used to draw the edges')
-
+parser.add_argument('-increment',  type=float, default=1,
+                    help='Increment factor')
 
 args = parser.parse_args()
     
 net = nx.read_gpickle(args.f)
 output = dirname(args.f) 
-DrawNetwork(net, output, pdb_path=args.pdb_path, method=args.drawing_method, colors=args.drawing_colors)    
+DrawNetwork(net, output, pdb_path=args.pdb_path, method=args.drawing_method, colors=args.drawing_colors, increment=args.increment)    
