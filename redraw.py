@@ -16,7 +16,7 @@ parser.add_argument('-pdb_path',  type=str,
 parser.add_argument('-drawing_colors',  type=str, nargs=2, default=['red', 'dodgerblue'],
                     help='Color used to draw the edges')
 parser.add_argument('-increment',  type=float, default=1,
-                    help='Increment factor')
+                    help='Increment step to redraw')
 
 args = parser.parse_args()
     
