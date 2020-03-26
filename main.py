@@ -17,7 +17,7 @@ parser.add_argument('path2',  type=str,
                     help='Input file/folder of the perturbed state')
 parser.add_argument('output',  type=str,
                     help='Folder where to put the results')  
-parser.add_argument('-avg',  type=bool, default=True,
+parser.add_argument('-avg',  type=bool, default=False,
                     help='Does the average of the input on folders')
 parser.add_argument('-std',  type=bool, default=False,
                     help='Does the std modulated by avg of the input on folders')

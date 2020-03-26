@@ -8,12 +8,17 @@ import itertools
 from Bio.PDB.Polypeptide import aa1, aa3
 from Bio.PDB import PDBParser
 from math import sqrt, copysign
+from mayavi import mlab
+from tqdm import tqdm
 import warnings
 import argparse
 from copy import deepcopy
 from CreateNetwork import three2one
+from time import sleep
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 warnings.simplefilter('ignore', PDBConstructionWarning)
+
+mlab.options.offscreen = True
 
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
@@ -29,6 +34,9 @@ class DrawNetwork():
             self.draw_IGPS()
         elif method == '4CFF':
             self.draw_4CFF()
+        elif method == '3d':
+            assert self.pdb_path, 'Not PDB file specified'
+            self.draw_default(pos=None, threeD=True)
         elif method == 'single':
             self.drawing(self.output, pos=None)
         else:
@@ -73,7 +81,7 @@ class DrawNetwork():
         else:
             self.drawing(self.output, pos)   
 
-    def draw_default(self, pos):
+    def draw_default(self, pos, threeD=False):
         """Default method to draw the networks. A dictionnary (pos) can be given to draw specific nodes in specific positions"""
         threshold = 0
         empty = False
@@ -88,7 +96,11 @@ class DrawNetwork():
 
             if len(self.net.edges()) != 0:
                 output_path = jn(self.output, str(threshold))
-                self.drawing(output_path, pos)    
+                if not threeD:
+                    self.drawing(output_path, pos)
+                else:
+                    pos = self.get_3d_pos()
+                    self.draw_3d(output_path, pos)    
                 threshold += self.increment 
             else:
                 empty = True
@@ -114,4 +126,41 @@ class DrawNetwork():
         nx.write_gpickle(self.net, output_path+'.p')
         plt.savefig(output_path+'.pdf')
         plt.close()
+
+    def draw_3d(self, output_path, pos):
+        mlab.clf()
+        figure = mlab.figure(bgcolor=(1, 1, 1))
+        name2id = {elt: i for i, elt in enumerate(self.net.nodes())}
+        id2name = {i: elt for i, elt in enumerate(self.net.nodes())}
+        integer_net = nx.relabel_nodes(self.net, name2id)
+        xyz = np.array([pos[elt] for elt in self.net.nodes()])
+        figure.scene.disable_render = True # Super duper trick
+        pts = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
+                    color=(0.5,0.5,0.5),
+                    scale_factor=1,
+                    scale_mode='none',
+                    resolution=20)
+        for i, x in enumerate(xyz):
+            mlab.text3d(x[0], x[1], x[2], id2name[i], scale=(1, 1, 1), color=(0,0,0))
+        colors_str = list(nx.get_edge_attributes(integer_net, 'color').values())
+        color_str2rgb = {'g': (0., 0.5, 1.), 'r': (1., 0., 0.)}
+        widths = np.array(list(nx.get_edge_attributes(integer_net, 'weight').values()))
+        colors_rgb = [color_str2rgb[color] for color in colors_str]
+
+        # pts.mlab_source.dataset.lines = np.array(integer_net.edges())
+        # tube = mlab.pipeline.tube(pts, tube_radius=0.1, tube_color=colors_rgb)
+        # mlab.pipeline.surface(tube)
+        for i, (u, v) in enumerate(tqdm(integer_net.edges())):
+            mlab.plot3d(*[[xyz[u, i], xyz[v, i]] for i in range(0,3)], tube_radius=widths[i]*0.05, color=color_str2rgb[colors_str[i]])
+        mlab.savefig(output_path+'.png', magnification=10)
+
+    def get_3d_pos(self):
+        structure = PDBParser().get_structure('X', self.pdb_path)[0]
+        pos = {}        
+        for atom in structure.get_atoms():
+            if atom.id == 'CA':
+                residue = atom.parent
+                if residue.resname in three2one:
+                    pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = atom.coord
+        return pos
 
