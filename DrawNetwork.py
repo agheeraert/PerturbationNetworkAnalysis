@@ -35,7 +35,7 @@ class DrawNetwork():
         elif method == '4CFF':
             self.draw_4CFF()
         elif method == '3d':
-            assert self.pdb_path, 'Not PDB file specified'
+            assert self.pdb_path, 'No PDB file specified'
             self.draw_default(pos=None, threeD=True)
         elif method == 'single':
             self.drawing(self.output, pos=None)
@@ -153,6 +153,7 @@ class DrawNetwork():
         for i, (u, v) in enumerate(tqdm(integer_net.edges())):
             mlab.plot3d(*[[xyz[u, i], xyz[v, i]] for i in range(0,3)], tube_radius=widths[i]*0.05, color=color_str2rgb[colors_str[i]])
         mlab.savefig(output_path+'.png', magnification=10)
+        nx.write_gpickle(self.net, output_path+'.p')
 
     def get_3d_pos(self):
         structure = PDBParser().get_structure('X', self.pdb_path)[0]

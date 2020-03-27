@@ -24,10 +24,10 @@ three2one['GLH'] = 'E'
 three2one['ASH'] = 'D'
 three2one['S2P'] = 'S'
 
-class CreateNetwork:
-    def __init__(self, pos1=None, pos2=None, cutoff=5):
-        self.pos1 = pos1
-        self.pos2 = pos2
+class AANetwork:
+    def __init__(self, cutoff=5):
+        # self.pos1 = pos1
+        # self.pos2 = pos2
         self.three2one = three2one
         self.one2three = one2three 
         self.cutoff = cutoff
@@ -37,11 +37,11 @@ class CreateNetwork:
         mol = bg.Pmolecule(pdb)
         self.net = mol.network(cutoff=self.cutoff, weight=True)
         self.structure = PDBParser().get_structure('X', pdb)[0]
-        if self.pos1 and self.pos2:
-            for node in list(self.net.nodes):
-                pos = int(node[1::])
-                if pos not in range(self.pos1, self.pos2):
-                    self.net.remove_node(node)
+        # if self.pos1 and self.pos2:
+        #     for node in list(self.net.nodes):
+        #         pos = int(node[1::])
+        #         if pos not in range(self.pos1, self.pos2):
+        #             self.net.remove_node(node)
 
         residues = []
         for residue in self.structure.get_residues():
@@ -52,10 +52,10 @@ class CreateNetwork:
         self.net = nx.relabel_nodes(self.net, mapping)
         return self.net
 
-    def save(self, pdb, output):
-        """Directtly saves the network"""
-        net = self.create(pdb)
-        nx.write_gpickle(net, output)
+    def save(self, output):
+        """Saves the network"""
+        assert self.net, print('No network loaded')
+        nx.write_gpickle(self.net, output)
 
     def create_average(self, folder):
         """Creates the average network over a folder. The average is computed at each step for memory issues.
@@ -79,46 +79,49 @@ class CreateNetwork:
         for elt in weights:
             new_weights[elt]=weights[elt]/len(listdir(folder))
         nx.set_edge_attributes(net, name='weight', values=new_weights)
-        return net
+        self.net = net
+        return self.net
+##################### EXPERIMENTAL STD COMPUTATION THIS SHOULD WORK FINE BUT NOTHING HAS BEEN TESTER THOROUGHLY
+    # def create_avg_std(self, folder):
+    #     """Creates the average network modulated by the standard deviation over a folder."""
+    #     net = None
+    #     avg, std, previous_avg = {}, {}, {}
+    #     for i, filepath in enumerate(tqdm(listdir(folder))):
+    #         if net:
+    #             _net = self.create(join(folder, filepath))
+    #             for u, v in _net.edges():
+    #                 if (u, v) in avg:
+    #                     previous_avg[(u,v)] = avg[(u, v)]
+    #                     avg[(u,v)] = 1/(i+1)*(_net.get_edge_data(u, v)['weight']+i*avg[(u,v)])
+    #                     std[(u,v)] = sqrt(1/i*((i-1)*std[(u,v)]+i*(previous_avg[(u,v)]-avg[(u,v)])**2+(_net.get_edge_data(u, v)['weight']-avg[(u,v)])**2))
+    #                 else:
+    #                     avg[(u,v)] = 1/(i+1)*(_net.get_edge_data(u, v)['weight'])
+    #                     std[(u,v)] = 0
+    #             net = nx.compose(net, _net)
+    #         else:
+    #             net = self.create(join(folder, filepath))
+    #             for u, v in net.edges():
+    #                 avg[(u, v)] = net.get_edge_data(u, v)['weight']
+    #                 std[(u, v)] = 0
+    #     new_weights = {elt: avg[elt]*std[elt] for elt in avg}
+    #     nx.set_edge_attributes(net, name='weight', values=new_weights)
+    #     return net
 
-    def create_avg_std(self, folder):
-        """Creates the average network modulated by the standard deviation over a folder."""
-        net = None
-        avg, std, previous_avg = {}, {}, {}
-        for i, filepath in enumerate(tqdm(listdir(folder))):
-            if net:
-                _net = self.create(join(folder, filepath))
-                for u, v in _net.edges():
-                    if (u, v) in avg:
-                        previous_avg[(u,v)] = avg[(u, v)]
-                        avg[(u,v)] = 1/(i+1)*(_net.get_edge_data(u, v)['weight']+i*avg[(u,v)])
-                        std[(u,v)] = sqrt(1/i*((i-1)*std[(u,v)]+i*(previous_avg[(u,v)]-avg[(u,v)])**2+(_net.get_edge_data(u, v)['weight']-avg[(u,v)])**2))
-                    else:
-                        avg[(u,v)] = 1/(i+1)*(_net.get_edge_data(u, v)['weight'])
-                        std[(u,v)] = 0
-                net = nx.compose(net, _net)
-            else:
-                net = self.create(join(folder, filepath))
-                for u, v in net.edges():
-                    avg[(u, v)] = net.get_edge_data(u, v)['weight']
-                    std[(u, v)] = 0
-        new_weights = {elt: avg[elt]*std[elt] for elt in avg}
-        nx.set_edge_attributes(net, name='weight', values=new_weights)
-        return net
+###### OLD SAVE AVG FUNCTION, NOT NEEDED
+    # def save_avg(self, folder, output):
+    #     """Saves the average"""
+    #     net = self.create_average(folder)
+    #     nx.write_gpickle(net, output) 
 
-    def save_avg(self, folder, output):
-        """Saves the average"""
-        net = self.create_average(folder)
-        nx.write_gpickle(net, output) 
+###### USE THE DRAWNETWORK CLASS
+    # def draw_avg(self, folder, output):
+    #     """Draws and saves the average"""
+    #     net = self.create_average(folder)
+    #     f = plt.figure()
+    #     nx.draw(net, with_labels=True, font_weight='bold')
+    #     nx.write_gpickle(net, output)    
 
-    def draw_avg(self, folder, output):
-        """Draws and saves the average"""
-        net = self.create_average(folder)
-        f = plt.figure()
-        nx.draw(net, with_labels=True, font_weight='bold')
-        nx.write_gpickle(net, output)    
-
-    def draw(self, pdb, output):
-        """Draws the network"""
-        net = self.create(pdb)
-        nx.draw(net, with_labels=True, font_weight='bold')
+    # def draw(self, pdb, output):
+    #     """Draws the network"""
+    #     net = self.create(pdb)
+    #     nx.draw(net, with_labels=True, font_weight='bold')
