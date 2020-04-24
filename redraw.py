@@ -1,4 +1,4 @@
-from CreatePerturbationNetwork import CreatePerturbationNetwork
+from CreatePerturbationNetwork import PerturbationNetwork
 import os 
 from os.path import dirname 
 import argparse

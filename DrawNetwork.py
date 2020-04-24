@@ -22,11 +22,13 @@ mlab.options.offscreen = True
 
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
-    def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue'], single=False, increment=1):
+    def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue'], single=False, increment=1, node_size=100, font_size=10):
         print('Drawing...')
         self.net = network
         self.colors = colors
         self.pdb_path = pdb_path
+        self.font_size = font_size
+        self.node_size = node_size
         self.output = output
         self.single = single
         self.increment = increment
@@ -120,9 +122,9 @@ class DrawNetwork():
         weights = {(u, v): round(nx.get_edge_attributes(self.net, 'weight')[(u,v)]) for (u, v) in nx.get_edge_attributes(self.net, 'weight')}
         if pos:
             pos = {node: pos[node] for node in self.net.nodes()}
-            nx.draw(self.net, font_weight='bold', labels={node: node[:-2] for node in self.net.nodes()}, width=width, pos=pos, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
+            nx.draw(self.net, font_weight='bold', labels={node: node[:-2] for node in self.net.nodes()}, width=width, pos=pos, edge_color=colors, node_size=self.node_size, node_shape='o', font_size=self.font_size, node_color='lightgrey')
         else:
-            nx.draw(self.net, font_weight='bold', labels={node: node[:-2] for node in self.net.nodes()}, width=width, edge_color=colors, node_size=100, node_shape='o', font_size=10, node_color='lightgrey')
+            nx.draw(self.net, font_weight='bold', labels={node: node[:-2] for node in self.net.nodes()}, width=width, edge_color=colors, node_size=self.node_size, node_shape='o', font_size=self.font_size, node_color='lightgrey')
         nx.write_gpickle(self.net, output_path+'.p')
         plt.savefig(output_path+'.pdf')
         plt.close()

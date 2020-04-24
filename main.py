@@ -29,18 +29,29 @@ parser.add_argument('-p',  type=str,
                     help='PDB structure file to help draw the network (works only with the IGPS drawing method as of now)')
 parser.add_argument('-dc',  type=str, nargs=2, default=['red', 'dodgerblue'],
                     help='Color used to draw the edges')
+parser.add_argument('-af',  type=str, nargs='+', default=None,
+                    help='Toggles the Alignment mode and align between flags')
 
 
 args = parser.parse_args()
 
-assert exists(args.p), '%s not found' %args.p
+if args.dm != 'default':
+    assert exists(args.p), '%s not found' %args.p
 
 def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-for cutoff in args.c:
-    out_dir = jn(args.output, 'cutoff'+str(cutoff))
-    mkdir(out_dir)
-    pn = PerturbationNetwork(path1=args.path1, path2=args.path2, out_dir=out_dir, cutoff=cutoff)
-    pn.draw_perturbation(pdb_path=args.p, method=args.dm, colors=args.dc)
+if len(args.c) > 1:
+    for cutoff in args.c:
+        out_dir = jn(args.output, 'cutoff'+str(cutoff))
+        mkdir(out_dir)
+        pn = PerturbationNetwork(path1=args.path1, path2=args.path2, out_dir=out_dir, cutoff=cutoff)
+else:
+    mkdir(args.output)
+    pn = PerturbationNetwork(path1=args.path1, path2=args.path2, out_dir=args.output, cutoff=args.c[0])
+
+if args.af:
+    pn.align(args.af)
+
+pn.draw_perturbation(pdb_path=args.p, method=args.dm, colors=args.dc)    
