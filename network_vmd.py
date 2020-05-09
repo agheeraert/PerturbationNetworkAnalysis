@@ -72,7 +72,10 @@ for fichier in tqdm(args.f):
                     if u in args.ntodraw and v in args.ntodraw:
                         output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
                 else:
-                    output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
+                    try:                    
+                        output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
+                    except KeyError:
+                        pass
         output.write('draw color silver \n')
         for u in A.nodes():
             if args.ntodraw:

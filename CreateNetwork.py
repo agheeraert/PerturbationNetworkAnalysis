@@ -160,6 +160,13 @@ class AANetwork:
             mat = np.sum(weights, axis=1)
         elif method == 'n2':
             mat = np.sqrt(np.sum(np.square(weights), axis=1))
+        elif method == 'degs':
+            mat = np.sum(signs, axis=1)
+        elif method == 'deg1':
+            mat = np.sum(np.abs(signs), axis=1)
+        elif method == 'deg2':
+            mat = np.sqrt(np.sum(np.square(signs), axis=1))       
+            
         f = plt.figure()
         id2node = dict(zip(range(len(self.net.nodes)), self.net.nodes))
         indices = np.argsort(np.abs(np.squeeze(mat)))[:,-1:-11:-1]
@@ -177,6 +184,16 @@ class AANetwork:
         plt.colorbar()
         plt.savefig(output)
         plt.close()
+    
+    def sum(self):
+        assert self.net, print('network non existing')
+        colors = nx.get_edge_attributes(self.net, 'color')
+        sign = {edge: 2*(colors[edge] == 'r') - 1 for edge in colors }
+        nx.set_edge_attributes(self.net, sign, 'sign')
+        signs = nx.to_numpy_matrix(self.net, weight='sign')
+        weights = nx.to_numpy_matrix(self.net)
+        return np.sum(np.multiply(signs, weights))
+
             
             
 

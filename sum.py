@@ -10,24 +10,15 @@ import argparse
 
 from CreateNetwork import three2one, AANetwork
 
-parser = argparse.ArgumentParser(description='Creates the node weight line plot')
+parser = argparse.ArgumentParser(description='Get a network and outputs only the interface(s)')
 parser.add_argument('f',  type=str, nargs='+',
                     help='List of network files')
-parser.add_argument('m',  type=str, nargs=1,
-                    help='Name of the method used (all) all, (sum) simple sum, (n1) norm1, (n2), norm2')                   
 
 args = parser.parse_args()
-
-if args.m == ['all']:
-    m = ['sum', 'n1', 'n2']
-
-if args.m == ['deg']:
-    m = ['degs', 'deg1', 'deg2']
-
 
 for f in args.f:
     net = AANetwork()
     net.net = nx.read_gpickle(f)
-    assert '.p' in f, print('Should use the .p extension')
-    for method in m:
-        net.node_weigths_line(method, f.replace('.p', '_node_weights%s.png' %method))
+    print(f, net.sum())
+
+
