@@ -28,7 +28,10 @@ class TimePertNet(AANetwork):
         for filepath in tqdm(listdir(folder)):
             net = self.create(jn(folder, filepath))
             mat = np.array(nx.to_numpy_matrix(net))
-            L_mat.append(self.sum_interfaces(mat, net))
+            if self.operation == 'i':
+                L_mat.append(self.sum_interfaces(mat, net))
+            elif self.operation == 'nw':
+                L_mat.append(self.nw(mat))
         return np.stack(L_mat, axis=-1), net
     
     def smart_loader(self, path):
@@ -72,6 +75,11 @@ class TimePertNet(AANetwork):
         limit = next(i for i, x in enumerate(net.nodes()) if x[-1] != firstchain)
         contact_diff = (np.add(np.sum(mat[limit:,:limit], axis=(0,1)),np.sum(mat[:limit,limit:], axis=(0,1))))/2
         return contact_diff
+    
+    def nw(self, mat):
+        degree = np.sum((mat!=0), axis=0) #count non zeros to get degree
+        weight = np.sum(mat, axis=0)
+        return np.divide(weight, degree)
 
     def moving_avg(self, table, n=10):
         convo = np.convolve(table, np.ones((n+1,))/(n+1), mode='valid')
@@ -100,6 +108,41 @@ class TimePertNet(AANetwork):
         plt.legend()
         plt.tight_layout()
         plt.savefig(output)
+    
+    def covmatrix(self, output=None):
+        neighborhood_watches = np.concatenate(self.contact_diffs, axis=-1)
+        covmat = np.cov(neighborhood_watches)
+        if output:
+            np.save(output, covmat)
+        self.covmat = covmat
+    
+    def plot_covmatrix(self, output):
+        f = plt.figure()
+        firstchain = next(iter(self.nettop.nodes()))[-1]
+        limit = next(i for i, x in enumerate(self.nettop.nodes()) if x[-1] != firstchain)
+        n_aa = len(self.nettop.nodes())
+        ticks = [list(range(50,limit+1,50))+list(range(limit+50,n_aa+1,50)),list(range(50,limit+1,50))+list(range(50,n_aa+1-limit,50))]
+        plt.xticks(*ticks)
+        plt.yticks(*ticks)
+        plt.plot([limit+0.5, limit+0.5], [0,n_aa+1], linestyle=':', linewidth=1, color='k')
+        plt.imshow(self.covmat, origin='lower',cmap='jet', interpolation='none')
+        plt.colorbar()
+        plt.savefig(output, dpi=1000)
+        plt.close()
+
+    def topk_cov_matrix(self, k, reverse=False):
+        N, N = self.covmat.shape
+        if reverse:
+            _indices = np.argsort(self.covmat, axis=None)[:2*k:2] 
+        else:
+            _indices = np.argsort(self.covmat, axis=None)[-1:-2*k:-2]
+        indices = np.stack(np.divmod(_indices, N)).transpose()
+        resid2name = {i: aa for i, aa in enumerate(self.nettop.nodes())}
+        print(np.vectorize(resid2name.get)(indices))
+        for elt in self.covmat.reshape(-1)[_indices]:
+            print(elt)
+
+
 
 
         

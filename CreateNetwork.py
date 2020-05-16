@@ -5,6 +5,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from math import sqrt
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from math import log
 from os import listdir
@@ -87,7 +88,7 @@ class AANetwork:
         self.net = net
         return self.net
 
-    def get_interface(self):
+    def get_interface(self, output=False):
         assert self.net, print('No network defined')
         L_edges_to_remove = []
         for u, v in self.net.edges():
@@ -95,6 +96,12 @@ class AANetwork:
                 L_edges_to_remove.append((u,v))
         self.net.remove_edges_from(L_edges_to_remove)
         self.net.remove_nodes_from(list(nx.isolates(self.net)))
+        if output:
+            weights = np.sum(nx.to_numpy_matrix(self.net), axis=1)
+            degrees = np.sum(nx.to_numpy_matrix(self.net, weight=None), axis=1)
+            nw = np.divide(weights, degrees)  
+            df = pd.DataFrame(data=np.concatenate([degrees, weights, nw], axis=-1), index=self.net.nodes(), columns=['Degree', 'Weight', 'NW'])
+            df.to_excel(output)
 
     def threshold_loop(self, output, pdb, increment=1):
         threshold = 0
