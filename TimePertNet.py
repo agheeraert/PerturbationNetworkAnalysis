@@ -101,11 +101,13 @@ class TimePertNet(AANetwork):
             else:
                 plt.plot(contact_diff, color=color)
         if unit:
-            plt.xlabel('Time (in %s)' %unit)
+            plt.xlabel('Time (%s)' %unit)
         else:
             plt.xlabel('Frame number')
         plt.ylabel('Number of contacts at interface')
-        plt.legend()
+        lims = plt.gca().get_ylim()
+        plt.ylim((lims[0], lims[1]+20))
+        plt.legend(ncol=2)
         plt.tight_layout()
         plt.savefig(output)
     

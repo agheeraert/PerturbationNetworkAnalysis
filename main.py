@@ -31,6 +31,10 @@ parser.add_argument('-dc',  type=str, nargs=2, default=['red', 'dodgerblue'],
                     help='Color used to draw the edges')
 parser.add_argument('-af',  type=str, nargs='+', default=None,
                     help='Toggles the Alignment mode and align between flags')
+parser.add_argument('-am',  type=str, nargs=2, default=None,
+                    help="""Toggles the Alignment mode between a protein and a molecule, the protein should always be in first and the molecule in second
+                    First argument : name of the chain to align to the molecule
+                    Second argument : name of the molecule to align (with chain id)""")               
 
 
 args = parser.parse_args()

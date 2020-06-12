@@ -25,7 +25,10 @@ parser.add_argument('-same', type=bool, default=False,
                     help="use the same normalization factor for all drawn networks")
 parser.add_argument('-c', type=str, nargs=3, default=['red', 'blue', 'silver'],
                     help="changes the colors used to draw the network. In the order: edges that increases in contact number, edges that decreases in contact number, node")              
-
+parser.add_argument('-m', nargs=2, type=str,
+                    help="""Allows to draw on a non amino acid based molecule
+                    First argument: Molecule name
+                    Second argument: Atom of the molecule to center on""")
 args = parser.parse_args()
 
 
@@ -39,6 +42,11 @@ for atom in structure.get_atoms():
         if residue.resname in three2one:
                 coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
                 node2CA[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = coords
+    if atom.id == args.m[1] and atom.parent.resname == args.m[0]:
+        coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
+        node2CA[atom.parent.resname+str(atom.parent.id[1])+':'+atom.parent.parent.id] = coords
+        print(atom.parent.resname+str(atom.parent.id[1])+':'+atom.parent.parent.id)
+
 div = None
 for fichier in tqdm(args.f):
     out_path = fichier[:-2]+'.tcl'
@@ -75,7 +83,7 @@ for fichier in tqdm(args.f):
                     try:                    
                         output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
                     except KeyError:
-                        pass
+                        print('error drawing node ', node2CA[u])
         output.write('draw color silver \n')
         for u in A.nodes():
             if args.ntodraw:
@@ -85,6 +93,7 @@ for fichier in tqdm(args.f):
                 try:
                     output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
                 except KeyError:
+                    if len(args.m) == 0:
                         print('Warning, residue', u, 'probably mutated between the two networks')
 
 

@@ -48,10 +48,12 @@ class AANetwork:
         #         pos = int(node[1::])
         #         if pos not in range(self.pos1, self.pos2):
         #             self.net.remove_node(node)
-
         residues = []
         for residue in self.structure.get_residues():
-            residues.append(self.three2one[residue.resname])
+            if residue.resname in self.three2one:
+                residues.append(self.three2one[residue.resname])
+            else:
+                residues.append(residue.resname)
         old_labels = self.net.nodes
         labels = [a+b[1:]+':'+b[0] for a,b in zip(residues, old_labels)]
         mapping = dict(zip(old_labels, labels))

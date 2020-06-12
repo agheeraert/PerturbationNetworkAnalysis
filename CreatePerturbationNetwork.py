@@ -82,6 +82,22 @@ class PerturbationNetwork(AANetwork):
         holo2apo = dict(zip(L_holo, L_apo))
         self.net1 = self.net1.subgraph(L_apo)
         self.net2 = nx.relabel_nodes(self.net2.subgraph(L_holo), holo2apo)
+    
+    def align_prot_mol(self, chainname, molname):
+        """Aligns coarsely a molecule to a protein fragment
+        carful the first network should be the one with the protein
+        and the second one with the molecule. use the align function to align molecules"""
+        firstu = False
+        for v in self.net1.nodes():
+            if v[-1]==chainname:
+                if not firstu:
+                    firstu = True
+                    u = v
+                else:
+                    self.net1 = nx.contracted_nodes(self.net1, u, v)
+        self.net1 = nx.relabel_nodes(self.net1, {firstu: chainname})
+
+
         
     def perturbation(self, threshold=0):
         """Creates the perturbation network between the initialized networks at a specific threshold"""
