@@ -87,19 +87,31 @@ class TimePertNet(AANetwork):
         nanarray[:] = np.nan
         return np.concatenate([convo, nanarray], axis=-1)
 
-    def plot_interfaces(self, output, factor=None, unit=None, labels=None, moving=1):
+    def plot_interfaces(self, output, factor=None, unit=None, labels=None, moving=1, shadow=False):
         colors = itertools.cycle(('black', 'g', 'b', 'r', 'magenta', 'orange'))
         labels = iter(labels)
         f = plt.figure()
         for contact_diff in self.contact_diffs:
             if moving != 1:
-                contact_diff = self.moving_avg(contact_diff, moving)
+                if not shadow:
+                    contact_diff = self.moving_avg(contact_diff, moving)
+                else:
+                    other_contacts = self.moving_avg(contact_diff, moving)
             color = next(colors)
             label = next(labels)
             if factor:
-                plt.plot(np.arange(0, len(contact_diff)*factor, factor), contact_diff, label=label, color=color)
+                if not shadow:
+                    plt.plot(np.arange(0, len(contact_diff)*factor, factor), contact_diff, label=label, color=color)
+                else:
+                    plt.plot(np.arange(0, len(contact_diff)*factor, factor), other_contacts, label=label, color=color)
+                    plt.plot(np.arange(0, len(contact_diff)*factor, factor), contact_diff, color=color, alpha=0.2)
+
             else:
-                plt.plot(contact_diff, color=color)
+                if not shadow:
+                    plt.plot(contact_diff, color=color)
+                else:
+                    plt.plot(other_contacts, color=color)
+                    plt.plot(contact_diff, color=color, alpha=0.2)
         if unit:
             plt.xlabel('Time (%s)' %unit)
         else:

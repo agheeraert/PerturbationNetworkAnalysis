@@ -15,9 +15,9 @@ from DrawNetwork import DrawNetwork
 from CreateNetwork import three2one
 from CreatePerturbationNetwork import CreatePerturbationNetwork
 
-parser = argparse.ArgumentParser(description='Create induced perturbation network from perturbation network.')
-parser.add_argument('-f',  type=str, nargs='+',
-                    help='List of network to redraw with the zoomed induced perturbation network')
+parser = argparse.ArgumentParser(description='Separate type of interaction networks from a perturbation network.')
+parser.add_argument('f',  type=str, nargs='+',
+                    help='List of network to redraw separating the type of interaction')
 parser.add_argument('-drawing_method',  type=str, default='default',
                     help='Method used to draw the graphs. Default = Networkx default. IGPS = IGPS splitting.')
 parser.add_argument('-pdb_path',  type=str,

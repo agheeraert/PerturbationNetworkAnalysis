@@ -42,10 +42,11 @@ for atom in structure.get_atoms():
         if residue.resname in three2one:
                 coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
                 node2CA[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = coords
-    if atom.id == args.m[1] and atom.parent.resname == args.m[0]:
-        coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
-        node2CA[atom.parent.resname+str(atom.parent.id[1])+':'+atom.parent.parent.id] = coords
-        print(atom.parent.resname+str(atom.parent.id[1])+':'+atom.parent.parent.id)
+    if args.m:
+        if atom.id == args.m[1] and atom.parent.resname == args.m[0]:
+            coords = str(atom.coord[0]) + ' ' + str(atom.coord[1]) + ' ' + str(atom.coord[2])
+            node2CA[atom.parent.resname+str(atom.parent.id[1])+':'+atom.parent.parent.id] = coords
+            print(atom.parent.resname+str(atom.parent.id[1])+':'+atom.parent.parent.id)
 
 div = None
 for fichier in tqdm(args.f):
@@ -83,7 +84,7 @@ for fichier in tqdm(args.f):
                     try:                    
                         output.write('draw cylinder { ' + str(node2CA[u]) + ' '+ ' } ' + '{ ' + str(node2CA[v]) + ' '+ ' } radius '+str(A.get_edge_data(u, v)['weight']/div)+' \n')
                     except KeyError:
-                        print('error drawing node ', node2CA[u])
+                        print('error drawing node ', u)
         output.write('draw color silver \n')
         for u in A.nodes():
             if args.ntodraw:
@@ -93,7 +94,7 @@ for fichier in tqdm(args.f):
                 try:
                     output.write('draw sphere { ' + str(node2CA[u]) + ' '+ ' } radius '+str(args.norm)+' \n')
                 except KeyError:
-                    if len(args.m) == 0:
+                    if not args.m:
                         print('Warning, residue', u, 'probably mutated between the two networks')
 
 

@@ -31,6 +31,6 @@ for frame in args.f:
                 else:
                     n = len(str(aa_id))-len(new_id)+1
                     new_id = ' '*n+new_id+' '
-                line = line.replace(' %s  ' %str(aa_id), new_id).replace(' A ', ' %s ' %chain)
+                line = line.replace(' %s  ' %str(aa_id), new_id).replace(' X ', ' %s ' %chain)
             tempfile.write(line)
     shutil.move(temp, frame)
