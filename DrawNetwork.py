@@ -22,7 +22,7 @@ mlab.options.offscreen = True
 
 class DrawNetwork():
     """Draws (and save) perturbation networks"""
-    def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue'], single=False, increment=1, node_size=100, font_size=10):
+    def __init__(self, network, output, pdb_path=None, method='default', colors=['red', 'dodgerblue'], single=False, increment=1, node_size=100, font_size=10, L_OXY=None, chaintop=None):
         print('Drawing...')
         self.net = network
         self.colors = colors
@@ -39,9 +39,13 @@ class DrawNetwork():
         elif method == '3d':
             assert self.pdb_path, 'No PDB file specified'
             self.draw_default(pos=None, threeD=True)
+        elif method == 'oxy':
+            assert len(L_OXY)== 9, 'Number of parameters for OXY method is not 9'
+            self.draw_OXY(L_OXY[:3],L_OXY[3:6],L_OXY[6:], chaintop)
         elif method == 'single':
             self.drawing(self.output, pos=None)
         else:
+            print('No method detected, computing default graph')
             self.draw_default(pos=None)
 
     def draw_4CFF(self):
@@ -81,7 +85,35 @@ class DrawNetwork():
         if not self.single:       
             self.draw_default(pos)
         else:
-            self.drawing(self.output, pos)   
+            self.drawing(self.output, pos)
+
+    def draw_OXY(self, O, X, Y, chaintop=None):
+        """ Draws the network using the O X Y method, O, X, Y are 3d coordinate points that should 
+        frame the representation"""
+        Ox = [c1-c2 for c1, c2 in zip(O, X)]   
+        Oy = [c1-c2 for c1, c2 in zip(O, Y)]
+        normOx = np.linalg.norm(Ox)  
+        normOy = np.linalg.norm(Oy)
+        structure = PDBParser().get_structure('X', self.pdb_path)[0]
+        pos = {}
+        distance_thresh = 1
+        for atom in structure.get_atoms():
+            if atom.id == 'CA':
+                residue = atom.parent
+                if chaintop:
+                    c = 1*(residue.parent.id == chaintop)
+                else:
+                    c = 0
+                if residue.resname in three2one:
+                        "we compute the coordinates using the distance of the point to the lines of the frame"
+                        AO = [c1-c2 for c1, c2 in zip(O, atom.coord)]
+                        x = np.linalg.norm(np.cross(AO,Ox))/normOx
+                        y = np.linalg.norm(np.cross(AO,Oy))/normOy+1*c
+                        pos[three2one[residue.resname]+str(residue.id[1])+':'+residue.parent.id] = (x, y)
+        if not self.single:       
+            self.draw_default(pos)
+        else:
+            self.drawing(self.output, pos)      
 
     def draw_default(self, pos, threeD=False):
         """Default method to draw the networks. A dictionnary (pos) can be given to draw specific nodes in specific positions"""

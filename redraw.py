@@ -17,9 +17,13 @@ parser.add_argument('-dc',  type=str, nargs=2, default=['red', 'dodgerblue'],
                     help='Color used to draw the edges')
 parser.add_argument('-i',  type=float, default=1,
                     help='Increment step to redraw')
+parser.add_argument('-oxy',  type=float, default=None, nargs=9,
+                    help='the 9 coordinates needed for OXY method (3 coordinates for each point of the frame)')
+parser.add_argument('-c',  type=str, default=None,
+                    help='Name of the top chain to separate the interface')
 
 args = parser.parse_args()
     
 net = nx.read_gpickle(args.f)
 output = dirname(args.f) 
-DrawNetwork(net, output, pdb_path=args.p, method=args.dm, colors=args.dc, increment=args.i)    
+DrawNetwork(net, output, pdb_path=args.p, method=args.dm, colors=args.dc, increment=args.i, L_OXY=args.oxy, chaintop=args.c)    
