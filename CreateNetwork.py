@@ -3,10 +3,16 @@ from Bio.PDB.Polypeptide import aa1, aa3
 from Bio.PDB import PDBParser
 import networkx as nx
 import matplotlib.pyplot as plt
+import pickle as pkl
 from math import sqrt
 import numpy as np
 import pandas as pd
+import sklearn.neighbors as nb
+import itertools as it
 from tqdm import tqdm
+import mdtraj as md
+import MDAnalysis as mda
+from MDAnalysis.core.universe import Merge
 from math import log
 from os import listdir
 from os.path import join
@@ -29,6 +35,37 @@ three2one['S2P'] = 'S'
 three2one['HSD'] = 'H'
 three2one['HSE'] = 'H'
 
+class AANetwork2:
+    def __init__(self, trajs, topo, cutoff=5, selection="not name H*"):
+        """New experimental class to build Amino Acid Networks
+        Doesn't work properly with multiple chains"""
+        u = mda.Universe(topo, trajs)
+        if selection != 'all': 
+            sel = Merge(u.select_atoms(selection, updating=True))
+        ag = sel.select_atoms(selection)
+        ca = sel.select_atoms("name CA")
+        id2res = dict(zip(ag.indices, ag.resindices))
+        self.atom2resname = dict(zip(ca.resindices, [three2one[elt]+str(num) for elt, num in zip(ca.resnames, ca.resids)]))
+        adjacency = np.zeros((ag.n_residues, ag.n_residues))
+        for i, ts in enumerate(tqdm(u.trajectory)):
+            xyz = sel.trajectory.ts.positions
+            tree = nb.BallTree(xyz)
+            couples = tree.query_radius(xyz, cutoff)
+            for i, L_neighbor in enumerate(couples):
+                res = id2res[i]
+                for neigh in L_neighbor:
+                    _res = id2res[neigh]
+                    if res != _res:
+                        adjacency[id2res[i], id2res[neigh]] += 1
+        self.adjacency = adjacency/len(u.trajectory)
+        net = nx.from_numpy_matrix(self.adjacency)
+        self.net = nx.relabel_nodes(net, self.atom2resname)
+
+    def save(self, path):
+        """Saves the AANetwork class"""
+        pkl.dump(self, open(path, 'wb'))       
+
+        
 
 class AANetwork:
     def __init__(self, cutoff=5):
@@ -203,7 +240,9 @@ class AANetwork:
         weights = nx.to_numpy_matrix(self.net)
         return np.sum(np.multiply(signs, weights))
 
-            
+if __name__ == '__main__':
+    # AANetwork2(['/home/aria/landslide/MDRUNS/YEAST/all_trajs/model%s_apo.dcd' % i for i in list(range(3,6))+['1','a']], topo='/home/aria/tmp/topo.pdb')
+    AANetwork2('/home/aria/landslide/MDRUNS/YEAST/all_trajs/model1_holo_protein.dcd', topo='/home/aria/tmp/topo.pdb')
             
 
 
