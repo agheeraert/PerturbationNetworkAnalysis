@@ -49,7 +49,10 @@ class PerturbationNetwork2():
         else: #dummy name generation
             string = 'aa_net%s.p' %next(num)
         if path[-2:] != '.p':
-            net = AANetwork2(*L_path[:-1], L_path[-1])
+            try:
+                net = AANetwork2(L_path[:-1], topo=L_path[-1])
+            except AttributeError:
+                print(L_path[:-1], 'ERRRRROR')
             net.save(join(self.out_dir, string))
         else: 
             #directly loads a precomputed network
@@ -79,7 +82,6 @@ class PerturbationNetwork2():
             empty = np.sum(self.pertmat) == 0
             if not empty:
                 net = self.reconstruct_net(pertmat, self.sign)
-                print(threshold, len(net.edges()))
                 self.draw(net, join(self.out_dir, '%s.pdf' % threshold))
                 self.vmd(net, join(self.out_dir, '%s.tcl' % threshold))
             threshold+=iterator
@@ -181,7 +183,9 @@ class PerturbationNetwork2():
 
 if __name__ == '__main__':
     # PerturbationNetwork2(['/home/aria/landslide/MDRUNS/YEAST/all_trajs/model1_apo.dcd', '/home/aria/tmp/topo.pdb'], ['/home/aria/landslide/MDRUNS/YEAST/all_trajs/model1_holo_protein.dcd', '/home/aria/tmp/topo.pdb'], 'results/test_newpn/')   
-    pn2 = PerturbationNetwork2(['results/test_newpn/model1_apo.p'], ['results/test_newpn/model1_holo_protein.p'], 'results/test_newpn/')   
+    # pn2 = PerturbationNetwork2(['results/test_newpn/model1_apo.p'], ['results/test_newpn/model1_holo_protein.p'], 'results/test_newpn/')   
+    pn2 = PerturbationNetwork2(['/home/aria/landslide/MDRUNS/YEAST/all_trajs/model%s_apo.dcd' %i for i in ['1', 'a']+list(range(3,7))]+['/home/aria/tmp/topo.pdb'], ['/home/aria/landslide/MDRUNS/YEAST/all_trajs/model%s_holo_protein.dcd' %i for i in ['1', 'a']+list(range(3,7))]+['/home/aria/tmp/topo.pdb'], '/home/aria/landslide/RESULTS/YEAST/all/')   
+
     pn2.save()
     pn2.set_drawing_parameters()
     pn2.iterator(drawing_method='oxy', pdb_drawing='/home/aria/tmp/topo.pdb', L_OXY=[44, 16, 57.5, 50.6, 75.5, 75.7, 32.26, 61.28, 14.43])
